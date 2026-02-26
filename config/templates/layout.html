@@ -61,14 +61,14 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
       <div class="container-fluid px-3">
-        <a class="navbar-brand" href="{% url 'whistle:case_list' %}"><i class="bi bi-megaphone-fill me-1"></i> 공익제보 관리</a>
+        <a class="navbar-brand" href="{% url 'whistle:dashboard' %}"><i class="bi bi-megaphone-fill me-1"></i> 공익제보 관리</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" href="{% url 'whistle:case_list' %}">
+                    <a class="nav-link active" href="{% url 'whistle:dashboard' %}">
                         <i class="bi bi-megaphone me-1"></i>공익제보
                     </a>
                 </li>
@@ -95,6 +95,11 @@
         </div>
 
         <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'whistle:dashboard' %}">
+                    <i class="bi bi-speedometer2 me-1"></i>대시보드
+                </a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'case_list' or request.resolver_match.url_name == 'case_detail' or request.resolver_match.url_name == 'case_create' or request.resolver_match.url_name == 'case_update' %}active{% endif %}" href="{% url 'whistle:case_list' %}">
                     <i class="bi bi-folder2-open me-1"></i>사건목록

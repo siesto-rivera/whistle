@@ -98,6 +98,37 @@ def whistle_search_api(request):
     return JsonResponse(results, safe=False)
 
 
+# ── 관리 대시보드 ────────────────────────────────────────────────
+
+
+class WhistleDashboardView(LoginRequiredMixin, TemplateView):
+    template_name = "whistle/dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["total_cases"] = WhistleCase.objects.count()
+        context["public_cases"] = WhistleCase.objects.filter(hide=False).count()
+        context["hidden_cases"] = WhistleCase.objects.filter(hide=True).count()
+        context["total_timelines"] = WhistleTimeline.objects.count()
+        context["total_articles"] = WhistleArticle.objects.count()
+        context["total_cheers"] = WhistleCheer.objects.count()
+        context["recent_cases"] = WhistleCase.objects.order_by("-id")[:5]
+        context["recent_cheers"] = WhistleCheer.objects.select_related("case").order_by("-created_at")[:5]
+        context["categories"] = (
+            WhistleCase.objects.filter(hide=False)
+            .values_list("category", flat=True)
+        )
+        # 카테고리별 건수
+        from django.db.models import Count
+        context["category_stats"] = (
+            WhistleCase.objects.filter(hide=False)
+            .values("category")
+            .annotate(count=Count("id"))
+            .order_by("-count")
+        )
+        return context
+
+
 # ── 공익제보 사건 ─────────────────────────────────────────────────
 
 

@@ -4,10 +4,12 @@ from . import views
 app_name = "whistle"
 
 urlpatterns = [
+    # 대시보드
+    path("", views.WhistleDashboardView.as_view(), name="dashboard"),
     # API
     path("api/whistle-search/", views.whistle_search_api, name="whistle_search_api"),
     # 공익제보 사건
-    path("", views.WhistleCaseListView.as_view(), name="case_list"),
+    path("cases/", views.WhistleCaseListView.as_view(), name="case_list"),
     path("<int:pk>/", views.WhistleCaseDetailView.as_view(), name="case_detail"),
     path("create/", views.WhistleCaseCreateView.as_view(), name="case_create"),
     path("<int:pk>/edit/", views.WhistleCaseUpdateView.as_view(), name="case_update"),
