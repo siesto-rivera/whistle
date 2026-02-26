@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko" >
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>공익제보 아카이브 관리</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        .navbar-nav .nav-link.active, .navbar-nav .nav-link.show {
+            color: #fff !important;
+            font-weight: 600;
+            border-bottom: 2px solid #fff;
+        }
+        .navbar-nav .nav-link {
+            padding: 0.5rem 0.75rem;
+            transition: color 0.2s;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #fff !important;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        /* sidebar */
+        #sidebar {
+            width: 220px;
+            min-height: calc(100vh - 56px);
+        }
+        #sidebar .sidebar-heading {
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+        }
+        #sidebar .nav-link {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            color: #495057;
+        }
+        #sidebar .nav-link:hover {
+            color: #0d6efd;
+            background-color: #e9ecef;
+            border-radius: 0.25rem;
+        }
+        #sidebar .nav-link.active {
+            color: #0d6efd !important;
+            font-weight: 600;
+            background-color: #e2e6ea;
+            border-radius: 0.25rem;
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+      <div class="container-fluid px-3">
+        <a class="navbar-brand" href="{% url 'whistle:case_list' %}"><i class="bi bi-megaphone-fill me-1"></i> 공익제보 관리</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'whistle:case_list' %}">
+                        <i class="bi bi-megaphone me-1"></i>공익제보
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/" target="_blank"><i class="bi bi-shield-lock me-1"></i>Django Admin</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'whistle_home' %}"><i class="bi bi-globe me-1"></i>사이트 홈</a>
+                </li>
+            </ul>
+        </div>
+      </div>
+    </nav>
+</header>
+
+<div class="d-flex">
+    {# ── 왼쪽 사이드바 ── #}
+    <nav id="sidebar" class="bg-light border-end flex-shrink-0 p-3 d-none d-lg-block">
+
+        <div class="sidebar-heading text-muted fw-bold text-uppercase mb-2">
+            <i class="bi bi-megaphone me-1"></i>공익제보
+        </div>
+
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'case_list' or request.resolver_match.url_name == 'case_detail' or request.resolver_match.url_name == 'case_create' or request.resolver_match.url_name == 'case_update' %}active{% endif %}" href="{% url 'whistle:case_list' %}">
+                    <i class="bi bi-folder2-open me-1"></i>사건목록
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'timeline_list' or request.resolver_match.url_name == 'timeline_detail' or request.resolver_match.url_name == 'timeline_create' or request.resolver_match.url_name == 'timeline_update' %}active{% endif %}" href="{% url 'whistle:timeline_list' %}">
+                    <i class="bi bi-clock-history me-1"></i>타임라인
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'article_list' or request.resolver_match.url_name == 'article_detail' or request.resolver_match.url_name == 'article_create' or request.resolver_match.url_name == 'article_update' %}active{% endif %}" href="{% url 'whistle:article_list' %}">
+                    <i class="bi bi-newspaper me-1"></i>관련기사
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'cheer_list' or request.resolver_match.url_name == 'cheer_delete' %}active{% endif %}" href="{% url 'whistle:cheer_list' %}">
+                    <i class="bi bi-heart me-1"></i>응원글
+                </a>
+            </li>
+        </ul>
+
+    </nav>
+
+    {# ── 본문 영역 ── #}
+    <div class="flex-grow-1">
+        <main>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} mb-0">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <div class="container-fluid px-4">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+
+        <footer class="text-body-secondary py-5">
+            <div class="container-fluid px-4">
+                    공익제보 아카이브 관리사이트
+            </div>
+        </footer>
+    </div>
+</div>
+
+</body>
+</html>

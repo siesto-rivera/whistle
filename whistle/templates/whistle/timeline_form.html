@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="my-4">
+    <h2 class="mb-0">
+        <i class="bi bi-clock-history me-2"></i>
+        {% if object %}타임라인 수정{% else %}타임라인 추가{% endif %}
+    </h2>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3">
+                    {% if field.name == "case" %}
+                        {% include "whistle/_whistle_autocomplete.html" %}
+                    {% else %}
+                        <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+                        {{ field }}
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>저장</button>
+                {% if object %}
+                    <a href="{% url 'whistle:timeline_detail' object.pk %}" class="btn btn-outline-secondary">취소</a>
+                {% else %}
+                    <a href="{% url 'whistle:timeline_list' %}" class="btn btn-outline-secondary">취소</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+{% include "whistle/_whistle_autocomplete_js.html" %}
+{% endblock %}

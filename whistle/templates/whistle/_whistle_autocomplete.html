@@ -1,0 +1,13 @@
+{# 공익제보 사건 검색 자동완성 — form 루프 안에서 field.name == "case" 일 때 include #}
+<label class="form-label fw-bold">사건</label>
+<div class="position-relative">
+    <input type="text"
+           id="whistle-case-search"
+           class="form-control"
+           placeholder="사건 제목을 입력하세요"
+           value="{% if object %}{{ object.case.title }}{% endif %}"
+           autocomplete="off">
+    {{ field }}
+    <ul id="whistle-case-results" class="list-group position-absolute w-100 shadow" style="z-index:1000; display:none; max-height:240px; overflow-y:auto;"></ul>
+</div>
+<div class="form-text text-muted">제목을 검색하여 선택하세요.</div>

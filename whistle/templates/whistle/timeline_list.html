@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center my-4">
+    <h2 class="mb-0"><i class="bi bi-clock-history me-2"></i>타임라인</h2>
+    <div class="d-flex gap-2">
+    <form method="get" class="d-flex" style="max-width:320px;">
+        <input type="text" name="q" value="{{ q }}" class="form-control me-2" placeholder="제목 / 사건명 검색">
+        <button type="submit" class="btn btn-dark"><i class="bi bi-search"></i></button>
+        {% if q %}
+            <a href="{% url 'whistle:timeline_list' %}" class="btn btn-outline-secondary ms-1" title="초기화"><i class="bi bi-x-lg"></i></a>
+        {% endif %}
+    </form>
+    <a href="{% url 'whistle:timeline_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>추가</a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col" style="width:60px;">#</th>
+                <th scope="col">사건</th>
+                <th scope="col">날짜</th>
+                <th scope="col">제목</th>
+                <th scope="col">내용</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for timeline in timelines %}
+            <tr>
+                <td class="text-muted">{{ timeline.id }}</td>
+                <td><a href="{% url 'whistle:case_detail' timeline.case.pk %}">{{ timeline.case }}</a></td>
+                <td>{{ timeline.rdate|date:'Y.n.j' }}</td>
+                <td><a href="{% url 'whistle:timeline_detail' timeline.pk %}" class="text-decoration-none"><strong>{{ timeline.title }}</strong></a></td>
+                <td>{{ timeline.contents|truncatechars:100 }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="5" class="text-center text-muted py-4">데이터가 없습니다.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include "_pagination.html" %}
+
+{% endblock %}

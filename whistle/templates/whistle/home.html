@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="참여연대 공익제보자 아카이브 - 용기 있는 목소리를 기록합니다"/>
+    <title>공익제보 아카이브 - 참여연대</title>
+
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"/>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        beige:      '#FAF9F5',
+                        sand:       '#F0EDE6',
+                        stone:      '#E8E3DC',
+                        ink:        '#2C2825',
+                        smoke:      '#8B847C',
+                        accent:     '#DC143C',
+                        'rose-soft':'#FEF2F2',
+                    },
+                    fontFamily: {
+                        sans: ['Pretendard Variable', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    animation: {
+                        'float':      'float 7s ease-in-out infinite',
+                        'float-slow': 'float 11s ease-in-out 3s infinite',
+                        'float-mid':  'float 9s ease-in-out 1.5s infinite',
+                        'pulse-soft': 'pulse-soft 2.5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%':      { transform: 'translateY(-18px)' },
+                        },
+                        'pulse-soft': {
+                            '0%, 100%': { opacity: '1' },
+                            '50%':      { opacity: '0.5' },
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html { font-size: 16px; scroll-behavior: smooth; }
+        body { background-color: #FAF9F5; }
+
+        /* 섹션 fade-in */
+        .fade-section {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .fade-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 카드 내부 이미지 확대 */
+        .card-zoom img {
+            transition: transform 0.5s ease;
+        }
+        .card-zoom:hover img {
+            transform: scale(1.06);
+        }
+
+        /* 스크롤바 숨기기 (cheer 가로 스크롤) */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 숫자 카운터 */
+        .count-up { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body class="font-sans text-ink antialiased">
+
+{# ══════════════════════════════════════════════ HEADER ══ #}
+<header class="fixed top-0 left-0 right-0 z-50 bg-beige/90 backdrop-blur-md border-b border-stone transition-all">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+
+        {# 로고 #}
+        <a href="{% url 'whistle_home' %}" class="flex items-center gap-2 font-extrabold text-base text-ink tracking-tight">
+            <span class="w-6 h-6 rounded-full bg-accent flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
+                </svg>
+            </span>
+            공익제보 아카이브
+        </a>
+
+        {# 데스크탑 메뉴 #}
+        <nav class="hidden md:flex items-center gap-8">
+            <a href="#archive"   class="text-sm text-smoke hover:text-ink   transition-colors">사건 아카이브</a>
+            <a href="#cheer"     class="text-sm text-smoke hover:text-ink   transition-colors">응원하기</a>
+            <a href="#resources" class="text-sm text-smoke hover:text-ink   transition-colors">자료 / 공지</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'whistle:case_list' %}" class="text-sm text-smoke hover:text-ink transition-colors">관리</a>
+            {% endif %}
+            <a href="https://www.peoplepower21.org/Support" target="_blank"
+               class="text-sm bg-accent text-white font-semibold px-5 py-2 rounded-full hover:bg-red-700 transition-colors shadow-sm">
+                후원하기
+            </a>
+        </nav>
+
+        {# 모바일 햄버거 #}
+        <button id="mobileMenuBtn" class="md:hidden text-smoke hover:text-ink transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path id="menuIconOpen"  stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                <path id="menuIconClose" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" class="hidden"/>
+            </svg>
+        </button>
+    </div>
+
+    {# 모바일 드롭다운 #}
+    <div id="mobileMenu" class="hidden md:hidden border-t border-stone bg-beige">
+        <div class="px-6 py-5 flex flex-col gap-4">
+            <a href="#archive"   class="text-sm text-smoke">사건 아카이브</a>
+            <a href="#cheer"     class="text-sm text-smoke">응원하기</a>
+            <a href="#resources" class="text-sm text-smoke">자료 / 공지</a>
+            <a href="https://www.peoplepower21.org/Support" target="_blank"
+               class="text-sm font-semibold text-accent">후원하기 →</a>
+        </div>
+    </div>
+</header>
+
+
+{# ══════════════════════════════════════════════ HERO ══ #}
+<section id="home" class="relative min-h-screen flex items-center pt-16 overflow-hidden bg-beige">
+
+    {# 배경 장식 요소 #}
+    <div class="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
+        <div class="absolute top-1/4 right-[10%] w-72 h-72 rounded-full bg-accent/5 animate-float"></div>
+        <div class="absolute top-[15%] right-[30%] w-20 h-20 rounded-full bg-accent/8 animate-float-mid"></div>
+        <div class="absolute bottom-1/4 left-[8%]  w-52 h-52 rounded-full bg-sand animate-float-slow"></div>
+        <div class="absolute bottom-[10%] right-[15%] w-14 h-14 rounded-full border-2 border-stone animate-float"></div>
+        {# 미세 도트 패턴 #}
+        <svg class="absolute inset-0 w-full h-full opacity-[0.04]" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="1.5" fill="#2C2825"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#dots)"/>
+        </svg>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-6 py-28 relative z-10">
+        <div class="max-w-3xl">
+
+            {# 뱃지 #}
+            <div class="inline-flex items-center gap-2 bg-rose-soft text-accent text-xs font-semibold px-4 py-1.5 rounded-full mb-8 border border-accent/15">
+                <span class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-soft"></span>
+                참여연대 공익법센터
+            </div>
+
+            {# 헤드라인 #}
+            <h1 class="text-5xl md:text-[4rem] font-extrabold leading-[1.15] tracking-tight mb-6 text-ink">
+                용기 있는 목소리를<br>
+                <span class="text-accent">기록합니다</span>
+            </h1>
+
+            {# 설명 #}
+            <p class="text-base md:text-lg text-smoke leading-relaxed mb-10 max-w-2xl">
+                참여연대 공익제보자 아카이브는 우리 사회를 더 나은 곳으로 이끈 공익제보자들을 기록한 데이터베이스입니다.
+                제보자들이 어떤 어려움을 겪었는지, 지금 어떻게 살아가고 있는지를 함께 기억합니다.
+            </p>
+
+            {# CTA 버튼 #}
+            <div class="flex flex-wrap gap-4 mb-16">
+                <a href="#archive"
+                   class="bg-accent text-white font-semibold text-sm px-8 py-3.5 rounded-full hover:bg-red-700 transition-all hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 shadow-sm">
+                    사건 아카이브 보기
+                </a>
+                <a href="#cheer"
+                   class="bg-white text-ink font-semibold text-sm px-8 py-3.5 rounded-full border border-stone hover:border-accent hover:text-accent transition-all hover:shadow-md">
+                    응원 메시지 남기기
+                </a>
+            </div>
+
+            {# 통계 #}
+            <div class="flex flex-wrap gap-10 pt-2">
+                <div>
+                    <div class="text-4xl font-extrabold text-ink count-up" data-target="{{ total_cases }}">0</div>
+                    <div class="text-sm text-smoke mt-1">공익제보 기록</div>
+                </div>
+                <div class="border-l border-stone pl-10">
+                    <div class="text-4xl font-extrabold text-ink count-up" data-target="{{ total_cheers }}">0</div>
+                    <div class="text-sm text-smoke mt-1">시민 응원</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {# 아래로 스크롤 힌트 #}
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 text-smoke animate-bounce">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </div>
+</section>
+
+
+{# ══════════════════════════════════════════════ 1. 공익제보 아카이브 ══ #}
+<section id="archive" class="py-24 bg-sand">
+    <div class="max-w-6xl mx-auto px-6">
+
+        {# 섹션 헤더 #}
+        <div class="fade-section flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div>
+                <div class="text-accent text-xs font-bold uppercase tracking-widest mb-2">Archive</div>
+                <h2 class="text-4xl font-extrabold text-ink">공익제보 아카이브</h2>
+                <p class="text-smoke mt-2 text-sm">용기 있는 선택을 한 이들의 이야기입니다.</p>
+            </div>
+            <a href="{% url 'whistle_public_list' %}"
+               class="shrink-0 inline-flex items-center gap-1.5 text-sm text-smoke hover:text-accent border border-stone hover:border-accent px-5 py-2.5 rounded-full transition-all">
+                전체 보기
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+
+        {# 카드 그리드 #}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {% for case in recent_cases %}
+            <a href="{% url 'whistle_public_detail' case.pk %}"
+               class="fade-section group card-zoom bg-beige rounded-2xl overflow-hidden border border-stone hover:border-accent/30 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+
+                {# 썸네일 #}
+                <div class="h-44 overflow-hidden bg-sand">
+                    {% if case.thumbnail %}
+                        <img src="{{ case.thumbnail.url }}" alt="{{ case.title }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-sand to-stone">
+                            <svg class="w-10 h-10 text-stone" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                      d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                            </svg>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {# 카드 본문 #}
+                <div class="p-5">
+                    <div class="flex items-center justify-between mb-2.5">
+                        {% if case.category %}
+                            <span class="text-xs font-semibold text-accent bg-rose-soft px-2.5 py-0.5 rounded-full border border-accent/10">{{ case.category }}</span>
+                        {% else %}
+                            <span></span>
+                        {% endif %}
+                        <span class="text-xs text-smoke">{{ case.case_year }}년</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-ink leading-snug line-clamp-2 group-hover:text-accent transition-colors">
+                        {{ case.title }}
+                    </h3>
+                    <p class="text-xs text-smoke mt-2.5 flex items-center gap-1">
+                        <svg class="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ case.whistleblower }}
+                    </p>
+                </div>
+            </a>
+            {% empty %}
+            <div class="col-span-3 text-center py-20 text-smoke">등록된 사건이 없습니다.</div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+
+{# ══════════════════════════════════════════════ 2. 응원하기 ══ #}
+<section id="cheer" class="py-24 bg-beige">
+    <div class="max-w-6xl mx-auto px-6">
+
+        {# 섹션 헤더 #}
+        <div class="fade-section text-center mb-14">
+            <div class="text-accent text-xs font-bold uppercase tracking-widest mb-2">Cheer</div>
+            <h2 class="text-4xl font-extrabold text-ink">응원하기</h2>
+            <p class="text-smoke mt-3 text-sm max-w-lg mx-auto leading-relaxed">
+                공익제보자들에게 힘이 되는 한마디를 남겨주세요.<br>
+                여러분의 응원이 용기 있는 선택을 기억하게 합니다.
+            </p>
+        </div>
+
+        {# 최근 응원글 #}
+        {% if recent_cheers %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+            {% for cheer in recent_cheers %}
+            <div class="fade-section bg-white rounded-2xl p-5 border border-stone hover:border-accent/20 hover:shadow-md transition-all">
+                <div class="flex items-start gap-3">
+                    {# 아바타 #}
+                    <div class="w-8 h-8 rounded-full bg-rose-soft border border-accent/20 flex items-center justify-center shrink-0">
+                        <span class="text-accent text-xs font-bold">{{ cheer.author_name|first }}</span>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-1.5 mb-1.5">
+                            <span class="font-semibold text-xs text-ink">{{ cheer.author_name }}</span>
+                            <span class="text-stone text-xs">→</span>
+                            <a href="{% url 'whistle_public_detail' cheer.case.pk %}"
+                               class="text-xs text-accent hover:underline truncate max-w-[120px]" title="{{ cheer.case.title }}">
+                                {{ cheer.case.title }}
+                            </a>
+                        </div>
+                        <p class="text-sm text-smoke leading-relaxed">{{ cheer.content|truncatechars:70 }}</p>
+                        <div class="text-xs text-stone mt-2.5">{{ cheer.created_at|date:"Y.m.d" }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {# 응원 유도 배너 #}
+        <div class="fade-section relative overflow-hidden bg-gradient-to-br from-rose-soft via-white to-sand rounded-3xl p-10 md:p-14 text-center border border-accent/10">
+            <div class="absolute top-4 right-6 text-7xl opacity-[0.06] select-none" aria-hidden="true">❤</div>
+            <div class="text-3xl mb-4" aria-hidden="true">❤️</div>
+            <h3 class="text-xl font-bold text-ink mb-2">제보자에게 응원을 보내주세요</h3>
+            <p class="text-smoke text-sm mb-7 max-w-sm mx-auto leading-relaxed">
+                사건 상세 페이지에서 직접 응원 메시지를 남길 수 있습니다.<br>
+                작은 말 한마디가 큰 힘이 됩니다.
+            </p>
+            <a href="{% url 'whistle_public_list' %}"
+               class="inline-block bg-accent text-white font-semibold text-sm px-8 py-3 rounded-full hover:bg-red-700 transition-all hover:shadow-lg hover:-translate-y-0.5">
+                제보자 찾아 응원하기
+            </a>
+        </div>
+
+    </div>
+</section>
+
+
+{# ══════════════════════════════════════════════ 3. 자료 / 공지 ══ #}
+<section id="resources" class="py-24 bg-sand">
+    <div class="max-w-6xl mx-auto px-6">
+
+        {# 섹션 헤더 #}
+        <div class="fade-section text-center mb-14">
+            <div class="text-accent text-xs font-bold uppercase tracking-widest mb-2">Resources</div>
+            <h2 class="text-4xl font-extrabold text-ink">자료 / 공지</h2>
+            <p class="text-smoke mt-3 text-sm">공익제보와 관련한 자료와 공지를 안내합니다.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+            {# 카드 1 — 전체 아카이브 #}
+            <a href="{% url 'whistle_public_list' %}"
+               class="fade-section group bg-beige rounded-2xl p-7 border border-stone hover:border-accent/30 hover:shadow-lg transition-all">
+                <div class="w-11 h-11 bg-rose-soft rounded-xl flex items-center justify-center mb-5 group-hover:bg-accent transition-colors">
+                    <svg class="w-5 h-5 text-accent group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                    </svg>
+                </div>
+                <h3 class="font-bold text-sm text-ink mb-2 group-hover:text-accent transition-colors">공익제보 전체 아카이브</h3>
+                <p class="text-xs text-smoke leading-relaxed">카테고리·연도별로 공익제보 사례를 검색하고 열람할 수 있습니다.</p>
+            </a>
+
+            {# 카드 2 — 참여연대 의정감시센터 #}
+            <a href="https://www.peoplepower21.org/politics" target="_blank"
+               class="fade-section group bg-beige rounded-2xl p-7 border border-stone hover:border-accent/30 hover:shadow-lg transition-all">
+                <div class="w-11 h-11 bg-rose-soft rounded-xl flex items-center justify-center mb-5 group-hover:bg-accent transition-colors">
+                    <svg class="w-5 h-5 text-accent group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                    </svg>
+                </div>
+                <h3 class="font-bold text-sm text-ink mb-2 group-hover:text-accent transition-colors">참여연대 의정감시센터</h3>
+                <p class="text-xs text-smoke leading-relaxed">참여연대의 의정 감시 활동과 공익제보 지원 현황을 확인하세요.</p>
+            </a>
+
+            {# 카드 3 — 후원 #}
+            <a href="https://www.peoplepower21.org/Support" target="_blank"
+               class="fade-section group bg-beige rounded-2xl p-7 border border-stone hover:border-accent/30 hover:shadow-lg transition-all">
+                <div class="w-11 h-11 bg-rose-soft rounded-xl flex items-center justify-center mb-5 group-hover:bg-accent transition-colors">
+                    <svg class="w-5 h-5 text-accent group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                </div>
+                <h3 class="font-bold text-sm text-ink mb-2 group-hover:text-accent transition-colors">참여연대 후원하기</h3>
+                <p class="text-xs text-smoke leading-relaxed">정부지원금 0%, 회원 회비로만 운영됩니다. 시민의 힘으로 함께해주세요.</p>
+            </a>
+
+        </div>
+    </div>
+</section>
+
+
+{# ══════════════════════════════════════════════ FOOTER ══ #}
+<footer class="bg-ink text-white">
+    <div class="max-w-6xl mx-auto px-6 py-14">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
+
+            {# 소개 #}
+            <div class="md:col-span-2">
+                <div class="flex items-center gap-2 font-extrabold text-base mb-4">
+                    <span class="w-5 h-5 rounded-full bg-accent flex items-center justify-center">
+                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
+                        </svg>
+                    </span>
+                    공익제보 아카이브
+                </div>
+                <p class="text-white/50 text-sm leading-relaxed max-w-md">
+                    참여연대 공익법센터가 운영하는 공익제보자 데이터베이스입니다.<br>
+                    더 나은 공익제보자 보호제도를 만들기 위한 기초 자료로 활용됩니다.
+                </p>
+            </div>
+
+            {# 바로가기 #}
+            <div>
+                <h4 class="font-semibold text-xs uppercase tracking-wider mb-4 text-white/50">바로가기</h4>
+                <ul class="space-y-2.5">
+                    <li><a href="{% url 'whistle_public_list' %}" class="text-sm text-white/60 hover:text-white transition-colors">사건 아카이브</a></li>
+                    <li><a href="https://www.peoplepower21.org" target="_blank" class="text-sm text-white/60 hover:text-white transition-colors">참여연대</a></li>
+                    <li><a href="https://watch.peoplepower21.org" class="text-sm text-white/60 hover:text-white transition-colors">열려라 국회</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
+            <p class="text-xs text-white/30">02-725-7104 &nbsp;|&nbsp; watch@pspd.org</p>
+            <p class="text-xs text-white/30">&copy; 1994-{% now "Y" %} 참여연대 &nbsp;·&nbsp; <a href="http://creativecommons.org/licenses/by-nc/4.0/" class="hover:text-white/60 transition-colors">CC BY-NC 4.0</a></p>
+        </div>
+    </div>
+</footer>
+
+
+{# ══════════════════════════════════════════════ JS ══ #}
+<script>
+/* 모바일 메뉴 */
+(function () {
+    const btn   = document.getElementById('mobileMenuBtn');
+    const menu  = document.getElementById('mobileMenu');
+    const open  = document.getElementById('menuIconOpen');
+    const close = document.getElementById('menuIconClose');
+    btn.addEventListener('click', () => {
+        menu.classList.toggle('hidden');
+        open.classList.toggle('hidden');
+        close.classList.toggle('hidden');
+    });
+    // 메뉴 내 링크 클릭 시 닫기
+    menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        menu.classList.add('hidden');
+        open.classList.remove('hidden');
+        close.classList.add('hidden');
+    }));
+})();
+
+/* 스크롤 fade-in */
+(function () {
+    const observer = new IntersectionObserver(
+        entries => entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+                observer.unobserve(e.target);
+            }
+        }),
+        { threshold: 0.12 }
+    );
+    document.querySelectorAll('.fade-section').forEach(el => observer.observe(el));
+})();
+
+/* 숫자 카운터 */
+(function () {
+    function animateCount(el) {
+        const target = parseInt(el.dataset.target, 10);
+        if (!target) { el.textContent = '0'; return; }
+        const duration = 1600;
+        const step = Math.ceil(target / (duration / 16));
+        let current = 0;
+        const timer = setInterval(() => {
+            current = Math.min(current + step, target);
+            el.textContent = current.toLocaleString('ko-KR');
+            if (current >= target) clearInterval(timer);
+        }, 16);
+    }
+
+    const heroObserver = new IntersectionObserver(
+        entries => entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.querySelectorAll('.count-up').forEach(animateCount);
+                heroObserver.unobserve(e.target);
+            }
+        }),
+        { threshold: 0.3 }
+    );
+    const heroSection = document.getElementById('home');
+    if (heroSection) heroObserver.observe(heroSection);
+})();
+
+/* 앵커 스크롤 오프셋 (고정 헤더 보정) */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function (e) {
+        const id = this.getAttribute('href');
+        if (id === '#') return;
+        const target = document.querySelector(id);
+        if (!target) return;
+        e.preventDefault();
+        const offset = 64; // 헤더 높이
+        const top = target.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: 'smooth' });
+    });
+});
+</script>
+
+</body>
+</html>

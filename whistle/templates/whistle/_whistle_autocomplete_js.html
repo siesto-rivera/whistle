@@ -1,0 +1,43 @@
+<script>
+$(function() {
+    var $input = $('#whistle-case-search');
+    var $hidden = $('#id_case');
+    var $results = $('#whistle-case-results');
+    var timer = null;
+
+    $input.on('input', function() {
+        clearTimeout(timer);
+        var q = $(this).val().trim();
+        if (q.length < 1) { $results.hide(); return; }
+        timer = setTimeout(function() {
+            $.getJSON("{% url 'whistle:whistle_search_api' %}", {q: q}, function(data) {
+                $results.empty();
+                if (!data.length) {
+                    $results.append('<li class="list-group-item text-muted">검색 결과가 없습니다</li>');
+                } else {
+                    $.each(data, function(i, c) {
+                        $results.append(
+                            $('<li class="list-group-item list-group-item-action" style="cursor:pointer"></li>')
+                                .text(c.title)
+                                .data('id', c.id)
+                        );
+                    });
+                }
+                $results.show();
+            });
+        }, 250);
+    });
+
+    $results.on('click', 'li.list-group-item-action', function() {
+        $input.val($(this).text());
+        $hidden.val($(this).data('id'));
+        $results.hide();
+    });
+
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#whistle-case-search, #whistle-case-results').length) {
+            $results.hide();
+        }
+    });
+});
+</script>

@@ -1,0 +1,154 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center my-4">
+    <h2 class="mb-0"><i class="bi bi-megaphone me-2"></i>{{ case.title }}</h2>
+    <div>
+        <a href="{% url 'whistle:case_update' case.pk %}" class="btn btn-outline-primary"><i class="bi bi-pencil me-1"></i>수정</a>
+        <a href="{% url 'whistle:case_list' %}" class="btn btn-outline-secondary"><i class="bi bi-list me-1"></i>목록</a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <table class="table table-bordered mb-0">
+            <tr><th style="width:150px;">제보년도</th><td>{{ case.case_year }}</td></tr>
+            <tr><th>제보자 성명</th><td>{{ case.whistleblower }}</td></tr>
+            <tr><th>제보대상기관</th><td>{{ case.organization }}</td></tr>
+            <tr><th>공익침해영역</th><td>{% if case.category %}<span class="badge bg-info">{{ case.category }}</span>{% else %}-{% endif %}</td></tr>
+            <tr><th>주요태그</th><td>{{ case.tags }}</td></tr>
+            <tr><th>비공개</th><td>{% if case.hide %}<span class="badge bg-secondary">비공개</span>{% else %}공개{% endif %}</td></tr>
+        </table>
+    </div>
+</div>
+
+{% if case.content %}
+<div class="card mb-4">
+    <div class="card-header"><strong>제보내용</strong></div>
+    <div class="card-body">{{ case.content|safe }}</div>
+</div>
+{% endif %}
+
+{% if case.situation %}
+<div class="card mb-4">
+    <div class="card-header"><strong>제보자 상황</strong></div>
+    <div class="card-body">{{ case.situation|safe }}</div>
+</div>
+{% endif %}
+
+{% if case.awards %}
+<div class="card mb-4">
+    <div class="card-header"><strong>수상이력</strong></div>
+    <div class="card-body">{{ case.awards|safe }}</div>
+</div>
+{% endif %}
+
+{% if case.support %}
+<div class="card mb-4">
+    <div class="card-header"><strong>참여연대 지원</strong></div>
+    <div class="card-body">{{ case.support|safe }}</div>
+</div>
+{% endif %}
+
+{% if case.media_coverage %}
+<div class="card mb-4">
+    <div class="card-header"><strong>미디어_언론보도</strong></div>
+    <div class="card-body">{{ case.media_coverage|safe }}</div>
+</div>
+{% endif %}
+
+{% if case.media_detail %}
+<div class="card mb-4">
+    <div class="card-header"><strong>언론보도 내역</strong></div>
+    <div class="card-body">{{ case.media_detail|safe }}</div>
+</div>
+{% endif %}
+
+{% if case.media_photo %}
+<div class="card mb-4">
+    <div class="card-header"><strong>미디어_사진</strong></div>
+    <div class="card-body">{{ case.media_photo|safe }}</div>
+</div>
+{% endif %}
+
+{% if case.quote %}
+<div class="card mb-4">
+    <div class="card-header"><strong>제보자 한마디</strong></div>
+    <div class="card-body">{{ case.quote|safe }}</div>
+</div>
+{% endif %}
+
+{% if case.hidden_violation %}
+<div class="card mb-4">
+    <div class="card-header"><strong>비공개_위반행위</strong></div>
+    <div class="card-body">{{ case.hidden_violation|safe }}</div>
+</div>
+{% endif %}
+
+{% if case.hidden_disadvantage %}
+<div class="card mb-4">
+    <div class="card-header"><strong>비공개_불이익상세</strong></div>
+    <div class="card-body">{{ case.hidden_disadvantage|safe }}</div>
+</div>
+{% endif %}
+
+{% if case.memo %}
+<div class="card mb-4">
+    <div class="card-header"><strong>참고</strong></div>
+    <div class="card-body">{{ case.memo|safe }}</div>
+</div>
+{% endif %}
+
+{# 타임라인 #}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <strong><i class="bi bi-clock-history me-1"></i>타임라인</strong>
+        <a href="{% url 'whistle:timeline_create' %}" class="btn btn-sm btn-outline-success"><i class="bi bi-plus-lg me-1"></i>추가</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr><th>날짜</th><th>제목</th><th>내용</th></tr>
+            </thead>
+            <tbody>
+                {% for t in timelines %}
+                <tr>
+                    <td>{{ t.rdate|date:'Y.n.j' }}</td>
+                    <td><a href="{% url 'whistle:timeline_detail' t.pk %}">{{ t.title }}</a></td>
+                    <td>{{ t.contents|truncatechars:80 }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="text-center text-muted py-3">없음</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# 관련기사 #}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <strong><i class="bi bi-newspaper me-1"></i>관련기사</strong>
+        <a href="{% url 'whistle:article_create' %}" class="btn btn-sm btn-outline-success"><i class="bi bi-plus-lg me-1"></i>추가</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr><th>출처</th><th>제목</th><th>URL</th></tr>
+            </thead>
+            <tbody>
+                {% for a in articles %}
+                <tr>
+                    <td>{{ a.category }}</td>
+                    <td><a href="{% url 'whistle:article_detail' a.pk %}">{{ a.title }}</a></td>
+                    <td>{% if a.link %}<a href="{{ a.link }}" target="_blank" class="text-truncate d-inline-block" style="max-width:300px;">{{ a.link }}</a>{% endif %}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="text-center text-muted py-3">없음</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center my-4">
+    <h2 class="mb-0"><i class="bi bi-clock-history me-2"></i>타임라인</h2>
+    <div>
+        <a href="{% url 'whistle:timeline_update' timeline.pk %}" class="btn btn-outline-primary"><i class="bi bi-pencil me-1"></i>수정</a>
+        <a href="{% url 'whistle:timeline_list' %}" class="btn btn-outline-secondary"><i class="bi bi-list me-1"></i>목록</a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <table class="table table-bordered mb-0">
+            <tr><th style="width:150px;">사건</th><td><a href="{% url 'whistle:case_detail' timeline.case.pk %}">{{ timeline.case }}</a></td></tr>
+            <tr><th>날짜</th><td>{{ timeline.rdate|date:'Y.n.j' }}</td></tr>
+            <tr><th>제목</th><td><strong>{{ timeline.title }}</strong></td></tr>
+            <tr><th>내용</th><td>{{ timeline.contents|linebreaksbr }}</td></tr>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

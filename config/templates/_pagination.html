@@ -1,0 +1,41 @@
+{% load humanize %}
+{% if page_obj.has_other_pages %}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1{% if q %}&q={{ q }}{% endif %}">&laquo; 처음</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}">&lsaquo; 이전</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">&laquo; 처음</span></li>
+            <li class="page-item disabled"><span class="page-link">&lsaquo; 이전</span></li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}">다음 &rsaquo;</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}">마지막 &raquo;</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled"><span class="page-link">다음 &rsaquo;</span></li>
+            <li class="page-item disabled"><span class="page-link">마지막 &raquo;</span></li>
+        {% endif %}
+    </ul>
+    <p class="text-center text-muted small">
+        {{ page_obj.paginator.count|intcomma }}건 중 {{ page_obj.start_index|intcomma }}-{{ page_obj.end_index|intcomma }}건 ({{ page_obj.number }}/{{ page_obj.paginator.num_pages }}페이지)
+    </p>
+</nav>
+{% endif %}

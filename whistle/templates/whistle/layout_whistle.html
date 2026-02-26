@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="공익제보 아카이브 - 참여연대"/>
+    <title>{% block title %}공익제보 아카이브{% endblock %}</title>
+
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.1/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --whistle-primary: #355F4D;
+            --whistle-dark: #1a3a2a;
+        }
+        html { font-size: 16px; height: 100%; }
+        body {
+            font-size: 1em;
+            font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Nanum Gothic", sans-serif;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            height: 100%;
+        }
+
+        /* ── Navbar ── */
+        .navbar-whistle {
+            background: var(--whistle-primary);
+        }
+        .navbar-whistle .navbar-brand {
+            font-weight: 800;
+            font-size: 1.15em;
+            color: #fff !important;
+            letter-spacing: -0.02em;
+        }
+        .navbar-whistle .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+        }
+        .navbar-whistle .nav-link:hover,
+        .navbar-whistle .nav-link.active {
+            color: #fff !important;
+        }
+
+        /* ── Footer ── */
+        .footer-whistle {
+            background: #f2f2f2;
+            color: #888;
+            font-size: 0.875em;
+        }
+        .footer-whistle a {
+            color: #888;
+            text-decoration: none;
+        }
+        .footer-whistle a:hover {
+            color: #333;
+        }
+
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+
+{# ── Navbar ── #}
+<nav class="navbar navbar-expand-lg navbar-dark navbar-whistle fixed-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'whistle_home' %}">
+            <i class="bi bi-megaphone-fill me-2"></i>공익제보 아카이브
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#whistleNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="whistleNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'whistle_public_list' %}"><i class="bi bi-grid me-1"></i>전체 사건</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://watch.peoplepower21.org"><i class="bi bi-house me-1"></i>열려라국회</a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item ms-lg-2" style="border-left:1px solid rgba(255,255,255,0.2); padding-left:0.5rem;">
+                    <a class="nav-link" href="{% url 'whistle:case_list' %}"><i class="bi bi-speedometer2 me-1"></i>관리</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{# ── Main Content ── #}
+<main style="flex:1;">
+    {% block content %}{% endblock %}
+</main>
+
+{# ── Footer ── #}
+<footer class="footer-whistle py-4">
+    <div class="container">
+        <div class="row align-items-start">
+            <div class="col-md-4">
+                <span style="font-weight:800; color:#333;"><i class="bi bi-megaphone-fill me-1"></i>공익제보 아카이브</span>
+                <p class="mt-2 mb-0">공익을 위해 용기 있는 목소리를 낸 제보자들의 사건을 기록합니다.</p>
+            </div>
+            <div class="col-md-4 mt-3 mt-md-0">
+                <p class="mb-1">참여연대 공익법센터</p>
+                <p class="mb-1"><i class="bi bi-telephone me-1"></i>02-725-7104 | <i class="bi bi-envelope me-1"></i>watch@pspd.org</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="http://www.peoplepower21.org" class="d-block mb-1">참여연대</a>
+                <a href="https://watch.peoplepower21.org" class="d-block mb-1">열려라국회</a>
+            </div>
+        </div>
+    </div>
+</footer>
+<div class="text-center py-2" style="background:#f2f2f2; border-top:1px solid #e5e5e5; font-size:0.75em; color:#888;">
+    &copy; 1994-{% now "Y" %} 참여연대. Some Rights Reserved <a href="http://creativecommons.org/licenses/by-nc/4.0/" style="color:#888;">CC BY-NC 4.0</a>
+</div>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>
