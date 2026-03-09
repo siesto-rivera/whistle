@@ -38,6 +38,9 @@ jobs:
 
           sudo docker run -d --name whistle_nginx --network whistle_net -p 80:80 --restart unless-stopped whistle_nginx
 
+          echo '>>> Collecting static files...'
+          sudo docker exec whistle_web python manage.py collectstatic --noinput || true
+
           echo '>>> Running migrations...'
           sudo docker exec whistle_web python manage.py migrate --noinput || true
 

@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="ko">
 <head>
@@ -5,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="참여연대 공익제보자 아카이브 - 용기 있는 목소리를 기록합니다"/>
     <title>공익제보 아카이브 - 참여연대</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'whistle/img/illust_whistle.svg' %}">
 
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"/>
 
@@ -75,6 +77,60 @@
 
         /* 숫자 카운터 */
         .count-up { font-variant-numeric: tabular-nums; }
+
+        /* ── 시민 한마디 마키 ── */
+        @keyframes voices-scroll {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .voices-track {
+            display: flex;
+            gap: 1.25rem;
+            width: max-content;
+            animation: voices-scroll 50s linear infinite;
+        }
+        .voices-outer:hover .voices-track {
+            animation-play-state: paused;
+        }
+        .voices-card {
+            flex-shrink: 0;
+            width: 22rem;
+            background: #fff;
+            border: 1px solid #E8E3DC;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: box-shadow 0.25s, border-color 0.25s, transform 0.25s;
+        }
+        .voices-card:hover {
+            box-shadow: 0 8px 24px rgba(44,40,37,0.10);
+            border-color: rgba(220,20,60,0.25);
+            transform: translateY(-3px);
+        }
+        .voices-quote {
+            font-size: 0.875rem;
+            color: #555;
+            line-height: 1.75;
+            flex: 1;
+        }
+        .voices-author {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid #F0EDE6;
+            padding-top: 0.75rem;
+        }
+        .voices-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #2C2825;
+        }
+        .voices-year {
+            font-size: 0.75rem;
+            color: #8B847C;
+        }
     </style>
 </head>
 <body class="font-sans text-ink antialiased">
@@ -85,11 +141,7 @@
 
         {# 로고 #}
         <a href="{% url 'whistle_home' %}" class="flex items-center gap-2 font-extrabold text-base text-ink tracking-tight">
-            <span class="w-6 h-6 rounded-full bg-accent flex items-center justify-center">
-                <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
-                </svg>
-            </span>
+            <img src="{% static 'whistle/img/illust_whistle.svg' %}" class="w-6 h-6" alt="공익제보 아카이브 로고">
             공익제보 아카이브
         </a>
 
@@ -337,7 +389,113 @@
 </section>
 
 
-{# ══════════════════════════════════════════════ 3. 자료 / 공지 ══ #}
+{# ══════════════════════════════════════════════ 3. 시민 한마디 ══ #}
+<section id="voices" class="py-24 bg-sand overflow-hidden">
+
+    {# 섹션 헤더 #}
+    <div class="max-w-6xl mx-auto px-6 mb-14">
+        <div class="fade-section text-center">
+            <div class="text-accent text-xs font-bold uppercase tracking-widest mb-2">Voices</div>
+            <h2 class="text-4xl font-extrabold text-ink">시민 한마디</h2>
+            <p class="text-smoke mt-3 text-sm">공익제보자를 응원하며 전하는 이야기입니다.</p>
+        </div>
+    </div>
+
+    {# Marquee 트랙 #}
+    <div class="voices-outer" style="overflow:hidden; cursor:default;">
+        <div class="voices-track">
+
+            {% for _ in "xx" %}{# 두 벌 복사 → 끊김 없는 루프 #}
+
+            <div class="voices-card">
+                <p class="voices-quote">"참여연대 회원이 된 지도 벌써 십 년이나 지났네요. 십 년이라는 시간 동안 늘 같은 자리를 묵묵히 지켜주어 감사합니다. 앞으로 저도 저의 자리에서 묵묵히 작은 힘을 보태며 살아가겠습니다."</p>
+                <div class="voices-author">
+                    <span class="voices-name">이인영 회원</span>
+                    <span class="voices-year">2013년 가입</span>
+                </div>
+            </div>
+
+            <div class="voices-card">
+                <p class="voices-quote">"어느 때보다 참여연대의 활동에 대하여 깊은 감사를 표하게 되는 시국입니다. 그러한 감사를 조금 더 적극적으로 표현할 방안이 있을까 고민하다 정기 후원 회원 가입으로 함께하게 되었습니다."</p>
+                <div class="voices-author">
+                    <span class="voices-name">윤창준 회원</span>
+                    <span class="voices-year">2023년 가입</span>
+                </div>
+            </div>
+
+            <div class="voices-card">
+                <p class="voices-quote">"사는 게 바쁘다는 이유로 사회 문제에 눈 감고 지낼 때도 있었습니다. 그때도 항상 참여연대는 제게 '우리는 언제나 여기에 있고, 당신 자체로 충분합니다'를 알려준 고마운 존재입니다."</p>
+                <div class="voices-author">
+                    <span class="voices-name">나윤경 회원</span>
+                    <span class="voices-year">2013년 가입</span>
+                </div>
+            </div>
+
+            <div class="voices-card">
+                <p class="voices-quote">"가장 먼저 떠오르는 단어는 최후의 보루예요. 내가 아무리 바쁘고 힘들고 지쳐도 참여연대는 우리 사회를 바꾸는 일을 여전히 할 거라고 생각하면 위안을 받거든요."</p>
+                <div class="voices-author">
+                    <span class="voices-name">이한규 회원</span>
+                    <span class="voices-year">2020년 가입</span>
+                </div>
+            </div>
+
+            <div class="voices-card">
+                <p class="voices-quote">"정부나 기업으로부터 후원금을 받지 않는 독립된 시민단체에 조금이나마 도움이 되어야겠다는 마음으로 가입했습니다. 참여연대는 나에게 참된 민주시민의식을 일깨워줍니다."</p>
+                <div class="voices-author">
+                    <span class="voices-name">남형우 회원</span>
+                    <span class="voices-year">2002년 가입</span>
+                </div>
+            </div>
+
+            <div class="voices-card">
+                <p class="voices-quote">"청년참여연대는 열린 공간이라서 더 다양한 청년들이 모이는 것 같아요. 한 가지 사안을 논의해도 의견이 정말 여러 가지로 나와요. 나에게 참여연대란? 믿을 수 있는 소통창구입니다."</p>
+                <div class="voices-author">
+                    <span class="voices-name">김지수 회원</span>
+                    <span class="voices-year">2024년 가입</span>
+                </div>
+            </div>
+
+            <div class="voices-card">
+                <p class="voices-quote">"나 하나 행동한다고 뭐가 바뀌겠나 자포자기 보다는, 직접 나서지 못하면 후원이라도 하자는 마음으로 가입했어요."</p>
+                <div class="voices-author">
+                    <span class="voices-name">홍유미 회원</span>
+                    <span class="voices-year">2023년 가입</span>
+                </div>
+            </div>
+
+            <div class="voices-card">
+                <p class="voices-quote">"많은 것이 나빠져가는 요즘이지만, 긴 호흡으로 보면 세상이 좀 더 나은 곳으로 변해온 것은 사실인 것 같습니다. 그 중심에 참여연대가 있었고, 저도 미약하나마 함께 할 수 있어 행복합니다."</p>
+                <div class="voices-author">
+                    <span class="voices-name">곽호종 회원</span>
+                    <span class="voices-year">2003년 가입</span>
+                </div>
+            </div>
+
+            <div class="voices-card">
+                <p class="voices-quote">"참여연대가 우리 사회의 빛과 소금으로 계속 성장하기를 바랍니다. 저도 그 길에 늘 함께 하겠습니다."</p>
+                <div class="voices-author">
+                    <span class="voices-name">양운신 회원</span>
+                    <span class="voices-year">2022년 가입</span>
+                </div>
+            </div>
+
+            <div class="voices-card">
+                <p class="voices-quote">"좀 더 나은 사회 만들기에 작게나마 손을 보태는 뿌듯함을 함께 느끼면 좋겠습니다."</p>
+                <div class="voices-author">
+                    <span class="voices-name">박수이 회원</span>
+                    <span class="voices-year">2023년 가입</span>
+                </div>
+            </div>
+
+            {% endfor %}
+
+        </div>
+    </div>
+
+</section>
+
+
+{# ══════════════════════════════════════════════ 4. 자료 / 공지 ══ #}
 <section id="resources" class="py-24 bg-sand">
     <div class="max-w-6xl mx-auto px-6">
 
@@ -402,11 +560,7 @@
             {# 소개 #}
             <div class="md:col-span-2">
                 <div class="flex items-center gap-2 font-extrabold text-base mb-4">
-                    <span class="w-5 h-5 rounded-full bg-accent flex items-center justify-center">
-                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
-                        </svg>
-                    </span>
+                    <img src="{% static 'whistle/img/illust_whistle.svg' %}" class="w-5 h-5" alt="공익제보 아카이브 로고">
                     공익제보 아카이브
                 </div>
                 <p class="text-white/50 text-sm leading-relaxed max-w-md">
@@ -421,7 +575,7 @@
                 <ul class="space-y-2.5">
                     <li><a href="{% url 'whistle_public_list' %}" class="text-sm text-white/60 hover:text-white transition-colors">사건 아카이브</a></li>
                     <li><a href="https://www.peoplepower21.org" target="_blank" class="text-sm text-white/60 hover:text-white transition-colors">참여연대</a></li>
-                    <li><a href="https://watch.peoplepower21.org" class="text-sm text-white/60 hover:text-white transition-colors">열려라 국회</a></li>
+                    <li><a href="https://watch.peoplepower21.org" class="text-sm text-white/60 hover:text-white transition-colors">열려라국회</a></li>
                 </ul>
             </div>
         </div>
