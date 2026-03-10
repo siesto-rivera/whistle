@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="ko">
 <head>
@@ -69,11 +70,7 @@
 
         {# 로고 #}
         <a href="{% url 'whistle_home' %}" class="flex items-center gap-2 font-extrabold text-base text-ink tracking-tight">
-            <span class="w-6 h-6 rounded-full bg-accent flex items-center justify-center">
-                <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
-                </svg>
-            </span>
+            <img src="{% static 'whistle/img/illust_whistle.svg' %}" class="w-9 h-9" alt="공익제보 아카이브 로고">
             공익제보 아카이브
         </a>
 
@@ -81,11 +78,11 @@
         <nav class="hidden md:flex items-center gap-8">
             <a href="{% url 'whistle_home' %}#archive"   class="text-sm text-smoke hover:text-ink transition-colors">사건 아카이브</a>
             <a href="{% url 'whistle_home' %}#cheer"     class="text-sm text-smoke hover:text-ink transition-colors">응원하기</a>
-            <a href="{% url 'whistle_home' %}#resources" class="text-sm text-smoke hover:text-ink transition-colors">자료 / 공지</a>
+            <a href="{% url 'whistle_home' %}#resources" class="text-sm text-smoke hover:text-ink transition-colors">자료실</a>
             {% if user.is_authenticated %}
             <a href="{% url 'whistle:case_list' %}" class="text-sm text-smoke hover:text-ink transition-colors">관리</a>
             {% endif %}
-            <a href="https://www.peoplepower21.org/Support" target="_blank"
+            <a href="https://together.kakao.com/fundraisings/133736/" target="_blank"
                class="text-sm bg-accent text-white font-semibold px-5 py-2 rounded-full hover:bg-red-700 transition-colors shadow-sm">
                 후원하기
             </a>
@@ -105,8 +102,8 @@
         <div class="px-6 py-5 flex flex-col gap-4">
             <a href="{% url 'whistle_home' %}#archive"   class="text-sm text-smoke">사건 아카이브</a>
             <a href="{% url 'whistle_home' %}#cheer"     class="text-sm text-smoke">응원하기</a>
-            <a href="{% url 'whistle_home' %}#resources" class="text-sm text-smoke">자료 / 공지</a>
-            <a href="https://www.peoplepower21.org/Support" target="_blank"
+            <a href="{% url 'whistle_home' %}#resources" class="text-sm text-smoke">자료실</a>
+            <a href="https://together.kakao.com/fundraisings/133736/" target="_blank"
                class="text-sm font-semibold text-accent">후원하기 →</a>
         </div>
     </div>
@@ -275,11 +272,7 @@
             {# 소개 #}
             <div class="md:col-span-2">
                 <div class="flex items-center gap-2 font-extrabold text-base mb-4">
-                    <span class="w-5 h-5 rounded-full bg-accent flex items-center justify-center">
-                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 2a8 8 0 100 16A8 8 0 0010 2zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
-                        </svg>
-                    </span>
+                    <img src="{% static 'whistle/img/illust_whistle.svg' %}" class="w-[30px] h-[30px]" alt="공익제보 아카이브 로고">
                     공익제보 아카이브
                 </div>
                 <p class="text-white/50 text-sm leading-relaxed max-w-md">
@@ -292,9 +285,8 @@
             <div>
                 <h4 class="font-semibold text-xs uppercase tracking-wider mb-4 text-white/50">바로가기</h4>
                 <ul class="space-y-2.5">
-                    <li><a href="{% url 'whistle_public_list' %}" class="text-sm text-white/60 hover:text-white transition-colors">사건 아카이브</a></li>
-                    <li><a href="https://www.peoplepower21.org" target="_blank" class="text-sm text-white/60 hover:text-white transition-colors">참여연대</a></li>
-                    <li><a href="https://watch.peoplepower21.org" class="text-sm text-white/60 hover:text-white transition-colors">열려라 국회</a></li>
+                    <li><a href="/about/" class="text-sm text-white/60 hover:text-white transition-colors">사이트 소개</a></li>
+                    <li><a href="https://www.peoplepower21.org" target="_blank" class="text-sm text-white/60 hover:text-white transition-colors">참여연대 바로가기</a></li>
                 </ul>
             </div>
         </div>
