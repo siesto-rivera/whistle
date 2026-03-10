@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 
 from whistle.views import (
+    AboutView,
     WhistleHomeView,
     PublicWhistleListView,
     PublicWhistleDetailView,
@@ -17,6 +18,7 @@ urlpatterns = [
     path("dashboard/whistle/", include("whistle.urls")),
     # 공개 페이지
     path("", WhistleHomeView.as_view(), name="whistle_home"),
+    path("about/", AboutView.as_view(), name="whistle_about"),
     path("cases/", PublicWhistleListView.as_view(), name="whistle_public_list"),
     path("<int:pk>/", PublicWhistleDetailView.as_view(), name="whistle_public_detail"),
     path("<int:pk>/cheer/", whistle_cheer_create, name="whistle_cheer_create"),

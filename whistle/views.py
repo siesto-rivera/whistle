@@ -15,6 +15,10 @@ from .models import WhistleCase, WhistleTimeline, WhistleArticle, WhistleCheer
 # ── 공개 페이지 (로그인 불필요) ────────────────────────────────
 
 
+class AboutView(TemplateView):
+    template_name = "whistle/about.html"
+
+
 class WhistleHomeView(TemplateView):
     template_name = "whistle/home.html"
 
