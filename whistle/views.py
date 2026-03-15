@@ -41,6 +41,7 @@ class PublicWhistleListView(ListView):
         queryset = WhistleCase.objects.filter(hide=False).order_by("-case_year", "-id")
         q = self.request.GET.get("q", "").strip()
         category = self.request.GET.get("category", "").strip()
+        organization = self.request.GET.get("organization", "").strip()
         if q:
             queryset = queryset.filter(
                 Q(title__icontains=q)
@@ -58,13 +59,17 @@ class PublicWhistleListView(ListView):
             )
         if category:
             queryset = queryset.filter(category=category)
+        if organization:
+            queryset = queryset.filter(organization=organization)
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["q"] = self.request.GET.get("q", "").strip()
         context["current_category"] = self.request.GET.get("category", "").strip()
+        context["current_organization"] = self.request.GET.get("organization", "").strip()
         context["categories"] = WhistleCase.CATEGORY_CHOICES
+        context["organizations"] = WhistleCase.ORGANIZATION_CHOICES
         return context
 
 
@@ -102,6 +107,20 @@ def whistle_search_api(request):
     return JsonResponse(results, safe=False)
 
 
+@login_required
+def tag_list_api(request):
+    """기존 태그 목록 JSON API"""
+    tags = set()
+    for val in WhistleCase.objects.values_list("tags", flat=True):
+        if not val:
+            continue
+        for t in val.split(","):
+            t = t.strip()
+            if t:
+                tags.add(t)
+    return JsonResponse(sorted(tags), safe=False)
+
+
 # ── 관리 대시보드 ────────────────────────────────────────────────
 
 
@@ -133,6 +152,41 @@ class WhistleDashboardView(LoginRequiredMixin, TemplateView):
         return context
 
 
+# ── 태그 통계 ──────────────────────────────────────────────────
+
+
+class TagStatsView(LoginRequiredMixin, TemplateView):
+    template_name = "whistle/tag_stats.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from collections import Counter
+        tag_counter = Counter()
+        tag_cases = {}
+        for case in WhistleCase.objects.all():
+            if not case.tags:
+                continue
+            for tag in case.tags.split(","):
+                tag = tag.strip()
+                if not tag:
+                    continue
+                tag_counter[tag] += 1
+                tag_cases.setdefault(tag, []).append(case)
+
+        selected_tag = self.request.GET.get("tag", "").strip()
+        sort = self.request.GET.get("sort", "name")
+        if sort == "count":
+            context["tag_stats"] = sorted(tag_counter.items(), key=lambda x: (-x[1], x[0]))
+        else:
+            context["tag_stats"] = sorted(tag_counter.items(), key=lambda x: x[0])
+        context["total_tags"] = len(tag_counter)
+        context["selected_tag"] = selected_tag
+        context["current_sort"] = sort
+        if selected_tag and selected_tag in tag_cases:
+            context["filtered_cases"] = tag_cases[selected_tag]
+        return context
+
+
 # ── 공익제보 사건 ─────────────────────────────────────────────────
 
 
@@ -142,21 +196,40 @@ class WhistleCaseListView(LoginRequiredMixin, ListView):
     template_name = "whistle/whistle_list.html"
     paginate_by = 30
 
+    SORT_OPTIONS = {
+        "title_asc": "title",
+        "title_desc": "-title",
+        "year_asc": "case_year",
+        "year_desc": "-case_year",
+        "hide_asc": "hide",
+        "hide_desc": "-hide",
+    }
+
     def get_queryset(self):
-        queryset = WhistleCase.objects.order_by("-case_year", "-id")
+        sort = self.request.GET.get("sort", "year_desc")
+        order = self.SORT_OPTIONS.get(sort, "-case_year")
+        queryset = WhistleCase.objects.order_by(order, "-id")
         q = self.request.GET.get("q", "").strip()
         category = self.request.GET.get("category", "").strip()
+        organization = self.request.GET.get("organization", "").strip()
         if q:
-            queryset = queryset.filter(title__icontains=q)
+            queryset = queryset.filter(
+                Q(title__icontains=q) | Q(whistleblower__icontains=q) | Q(tags__icontains=q)
+            )
         if category:
             queryset = queryset.filter(category=category)
+        if organization:
+            queryset = queryset.filter(organization=organization)
         return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["q"] = self.request.GET.get("q", "").strip()
         context["current_category"] = self.request.GET.get("category", "").strip()
+        context["current_organization"] = self.request.GET.get("organization", "").strip()
+        context["current_sort"] = self.request.GET.get("sort", "year_desc")
         context["categories"] = WhistleCase.CATEGORY_CHOICES
+        context["organizations"] = WhistleCase.ORGANIZATION_CHOICES
         return context
 
 
@@ -169,7 +242,52 @@ class WhistleCaseDetailView(LoginRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["timelines"] = WhistleTimeline.objects.filter(case=self.object).order_by("-rdate")
         context["articles"] = WhistleArticle.objects.filter(case=self.object)
+        context["timeline_form"] = WhistleTimelineForm(initial={"case": self.object.pk})
+        context["article_form"] = WhistleArticleForm(initial={"case": self.object.pk})
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form_type = request.POST.get("form_type")
+        # 삭제
+        if form_type == "delete_timeline":
+            obj = get_object_or_404(WhistleTimeline, pk=request.POST.get("item_pk"), case=self.object)
+            obj.delete()
+            return redirect("whistle:case_detail", pk=self.object.pk)
+        if form_type == "delete_article":
+            obj = get_object_or_404(WhistleArticle, pk=request.POST.get("item_pk"), case=self.object)
+            obj.delete()
+            return redirect("whistle:case_detail", pk=self.object.pk)
+        # 수정
+        if form_type == "edit_timeline":
+            obj = get_object_or_404(WhistleTimeline, pk=request.POST.get("item_pk"), case=self.object)
+            form = WhistleTimelineForm(request.POST, instance=obj)
+            if form.is_valid():
+                form.save()
+            return redirect("whistle:case_detail", pk=self.object.pk)
+        if form_type == "edit_article":
+            obj = get_object_or_404(WhistleArticle, pk=request.POST.get("item_pk"), case=self.object)
+            form = WhistleArticleForm(request.POST, instance=obj)
+            if form.is_valid():
+                form.save()
+            return redirect("whistle:case_detail", pk=self.object.pk)
+        # 추가
+        if form_type == "article":
+            form = WhistleArticleForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect("whistle:case_detail", pk=self.object.pk)
+            context = self.get_context_data()
+            context["article_form"] = form
+            return self.render_to_response(context)
+        else:
+            form = WhistleTimelineForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect("whistle:case_detail", pk=self.object.pk)
+            context = self.get_context_data()
+            context["timeline_form"] = form
+            return self.render_to_response(context)
 
 
 class WhistleCaseCreateView(LoginRequiredMixin, CreateView):

@@ -19,6 +19,13 @@
                             {{ field }}
                             <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                         </div>
+                    {% elif field.name == "tags" %}
+                        <label class="form-label fw-bold">{{ field.label }}</label>
+                        {{ field }}
+                        <div id="tag-container" class="d-flex flex-wrap gap-1 border rounded p-2 mb-1" style="min-height:42px; cursor:text;">
+                            <input type="text" id="tag-input" class="border-0 flex-grow-1" style="outline:none; min-width:120px;" placeholder="태그 입력 후 Enter" autocomplete="off">
+                        </div>
+                        <div id="tag-suggestions" class="list-group position-relative" style="z-index:10;"></div>
                     {% else %}
                         <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
                         {{ field }}
@@ -40,4 +47,113 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    const hiddenInput = document.getElementById('id_tags');
+    const container = document.getElementById('tag-container');
+    const input = document.getElementById('tag-input');
+    const suggestions = document.getElementById('tag-suggestions');
+    let allTags = [];
+
+    // 기존 태그 목록 로드
+    fetch('{% url "whistle:tag_list_api" %}')
+        .then(r => r.json())
+        .then(data => { allTags = data; });
+
+    // 초기값에서 태그 칩 생성
+    function init() {
+        const val = hiddenInput.value.trim();
+        if (!val) return;
+        val.split(',').forEach(t => {
+            t = t.trim();
+            if (t) addChip(t);
+        });
+    }
+
+    function addChip(tag) {
+        // 중복 방지
+        const existing = container.querySelectorAll('.tag-chip');
+        for (const el of existing) {
+            if (el.dataset.tag === tag) return;
+        }
+        const chip = document.createElement('span');
+        chip.className = 'tag-chip badge bg-primary d-flex align-items-center gap-1';
+        chip.dataset.tag = tag;
+        chip.style.fontSize = '0.85rem';
+        chip.innerHTML = tag + '<i class="bi bi-x" style="cursor:pointer;"></i>';
+        chip.querySelector('i').addEventListener('click', function() {
+            chip.remove();
+            syncHidden();
+        });
+        container.insertBefore(chip, input);
+        syncHidden();
+    }
+
+    function syncHidden() {
+        const chips = container.querySelectorAll('.tag-chip');
+        hiddenInput.value = Array.from(chips).map(c => c.dataset.tag).join(', ');
+    }
+
+    function showSuggestions(query) {
+        suggestions.innerHTML = '';
+        if (!query) return;
+        const existing = new Set(Array.from(container.querySelectorAll('.tag-chip')).map(c => c.dataset.tag));
+        const filtered = allTags.filter(t => t.toLowerCase().includes(query.toLowerCase()) && !existing.has(t));
+        filtered.slice(0, 10).forEach(tag => {
+            const item = document.createElement('a');
+            item.href = '#';
+            item.className = 'list-group-item list-group-item-action small py-1';
+            item.textContent = tag;
+            item.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                addChip(tag);
+                input.value = '';
+                suggestions.innerHTML = '';
+            });
+            suggestions.appendChild(item);
+        });
+    }
+
+    input.addEventListener('input', function() {
+        showSuggestions(this.value.trim());
+    });
+
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            const val = this.value.trim().replace(/,$/, '').trim();
+            if (val) {
+                addChip(val);
+                this.value = '';
+                suggestions.innerHTML = '';
+            }
+        }
+        if (e.key === 'Backspace' && !this.value) {
+            const chips = container.querySelectorAll('.tag-chip');
+            if (chips.length) {
+                chips[chips.length - 1].remove();
+                syncHidden();
+            }
+        }
+    });
+
+    input.addEventListener('blur', function() {
+        const val = this.value.trim();
+        if (val) {
+            addChip(val);
+            this.value = '';
+        }
+        setTimeout(() => { suggestions.innerHTML = ''; }, 150);
+    });
+
+    container.addEventListener('click', function() {
+        input.focus();
+    });
+
+    init();
+})();
+</script>
 {% endblock %}

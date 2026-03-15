@@ -3,24 +3,30 @@ from django.db import models
 
 class WhistleCase(models.Model):
     CATEGORY_CHOICES = [
-        ("인권", "인권"),
-        ("노동", "노동"),
-        ("환경", "환경"),
-        ("건강", "건강"),
-        ("안전", "안전"),
-        ("소비자이익", "소비자이익"),
-        ("공정한 경쟁", "공정한 경쟁"),
-        ("교육", "교육"),
-        ("민주주의/행정공정성", "민주주의/행정공정성"),
-        ("기타/침해영역", "기타/침해영역"),
+        ("공공재정", "공공재정"),
+        ("민주주의·권한남용", "민주주의·권한남용"),
+        ("소비자이익·공정경쟁", "소비자이익·공정경쟁"),
+        ("인권·노동", "인권·노동"),
+        ("학사·연구부정", "학사·연구부정"),
+        ("환경·건강·안전", "환경·건강·안전"),
+    ]
+
+    ORGANIZATION_CHOICES = [
+        ("교육기관", "교육기관"),
+        ("군·정보기관", "군·정보기관"),
+        ("민간기업", "민간기업"),
+        ("비영리단체", "비영리단체"),
+        ("수사·조사기관", "수사·조사기관"),
+        ("행정·공공기관", "행정·공공기관"),
+        ("기타", "기타"),
     ]
 
     thumbnail = models.ImageField("썸네일", upload_to="whistle/thumbnails/", blank=True)
     title = models.CharField("사건명", max_length=150, default="")
     case_year = models.CharField("제보년도", max_length=4, default="")
     whistleblower = models.CharField("제보자 성명", max_length=100, default="")
-    organization = models.CharField("제보대상기관", max_length=150, default="")
-    category = models.CharField("공익침해영역", max_length=50, choices=CATEGORY_CHOICES, default="")
+    organization = models.CharField("신고대상", max_length=50, choices=ORGANIZATION_CHOICES, default="")
+    category = models.CharField("공익침해분야", max_length=50, choices=CATEGORY_CHOICES, default="")
     tags = models.CharField("주요태그", max_length=255, default="")
     content = models.TextField("제보내용", blank=True)
     situation = models.TextField("제보자 상황", blank=True)
@@ -30,8 +36,8 @@ class WhistleCase(models.Model):
     media_detail = models.TextField("언론보도 내역", blank=True)
     media_photo = models.TextField("미디어_사진", blank=True)
     quote = models.TextField("제보자 한마디", blank=True)
-    hidden_violation = models.TextField("비공개_위반행위", blank=True)
-    hidden_disadvantage = models.TextField("비공개_불이익상세", blank=True)
+    hidden_violation = models.TextField("위반행위", blank=True)
+    hidden_disadvantage = models.TextField("불이익상세", blank=True)
     memo = models.TextField("참고", blank=True)
     hide = models.BooleanField("비공개", default=False)
 

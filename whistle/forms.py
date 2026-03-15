@@ -1,3 +1,5 @@
+from datetime import date
+
 from django import forms
 from django_summernote.widgets import SummernoteWidget
 
@@ -5,6 +7,14 @@ from .models import WhistleCase, WhistleTimeline, WhistleArticle, WhistleCheer
 
 
 class WhistleCaseForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        current_year = date.today().year
+        min_year = WhistleCase.objects.exclude(case_year="").order_by("case_year").values_list("case_year", flat=True).first()
+        start = int(min_year) if min_year else current_year
+        choices = [("", "---------")] + [(str(y), str(y)) for y in range(start, current_year + 1)]
+        self.fields["case_year"].widget = forms.Select(attrs={"class": "form-select"}, choices=choices)
+
     class Meta:
         model = WhistleCase
         fields = [
@@ -19,9 +29,9 @@ class WhistleCaseForm(forms.ModelForm):
             "title": forms.TextInput(attrs={"class": "form-control"}),
             "case_year": forms.TextInput(attrs={"class": "form-control", "maxlength": 4}),
             "whistleblower": forms.TextInput(attrs={"class": "form-control"}),
-            "organization": forms.TextInput(attrs={"class": "form-control"}),
+            "organization": forms.Select(attrs={"class": "form-select"}),
             "category": forms.Select(attrs={"class": "form-select"}),
-            "tags": forms.TextInput(attrs={"class": "form-control", "placeholder": "쉼표로 구분"}),
+            "tags": forms.HiddenInput(),
             "content": SummernoteWidget(),
             "situation": SummernoteWidget(),
             "awards": SummernoteWidget(),
