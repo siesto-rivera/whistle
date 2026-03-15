@@ -339,49 +339,66 @@
         </div>
         {% endif %}
 
+        <div id="disqus_thread" class="mt-8 bg-white rounded-2xl border border-stone overflow-hidden shadow-sm p-6"></div>
+        <script>
+            var disqus_config = function () {
+                this.page.url = '{{ request.build_absolute_uri }}';
+                this.page.identifier = 'whistle-case-{{ case.pk }}';
+                this.page.title = '{{ case.title|escapejs }}';
+            };
+            (function() {
+                var d = document, s = d.createElement('script');
+                // s.src = 'https://whistle-pspd.disqus.com/embed.js';
+                s.src = 'https://peoplepower21.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+        <noscript>댓글을 보려면 JavaScript를 활성화해주세요.</noscript>
+
         {# ──────────────── 응원글 ──────────────── #}
-        <div id="cheers" class="bg-white rounded-2xl border border-stone overflow-hidden shadow-sm">
-            <div class="px-6 py-3.5 border-b border-stone flex items-center gap-2">
-                <svg class="w-4 h-4 text-accent" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-                </svg>
-                <span class="font-bold text-sm text-ink">응원글</span>
-                <span class="ml-1 text-xs text-smoke">(<span id="cheer-count">0</span>)</span>
-            </div>
-            <div id="cheer-list" class="px-6 py-5 space-y-4">
-                <p class="text-sm text-smoke" id="cheer-empty">불러오는 중...</p>
-            </div>
-        </div>
+<!--        <div id="cheers" class="bg-white rounded-2xl border border-stone overflow-hidden shadow-sm">-->
+<!--            <div class="px-6 py-3.5 border-b border-stone flex items-center gap-2">-->
+<!--                <svg class="w-4 h-4 text-accent" fill="currentColor" viewBox="0 0 20 20">-->
+<!--                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>-->
+<!--                </svg>-->
+<!--                <span class="font-bold text-sm text-ink">응원글</span>-->
+<!--                <span class="ml-1 text-xs text-smoke">(<span id="cheer-count">0</span>)</span>-->
+<!--            </div>-->
+<!--            <div id="cheer-list" class="px-6 py-5 space-y-4">-->
+<!--                <p class="text-sm text-smoke" id="cheer-empty">불러오는 중...</p>-->
+<!--            </div>-->
+<!--        </div>-->
 
         {# ──────────────── 응원글 작성 ──────────────── #}
-        <div class="bg-white rounded-2xl border border-stone overflow-hidden shadow-sm">
-            <div class="px-6 py-3.5 border-b border-stone flex items-center gap-2">
-                <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                </svg>
-                <span class="font-bold text-sm text-ink">응원글 작성</span>
-            </div>
-            <div class="px-6 py-5">
-                <form id="cheer-form" class="space-y-4">
-                    {% csrf_token %}
-                    <div>
-                        <label class="block text-xs font-semibold text-smoke mb-1.5">이름</label>
-                        {{ cheer_form.author_name }}
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-smoke mb-1.5">응원 메시지</label>
-                        {{ cheer_form.content }}
-                    </div>
-                    <button type="submit" id="cheer-submit-btn"
-                            class="inline-flex items-center gap-2 bg-accent text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-red-700 transition-all hover:shadow-md disabled:opacity-60">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
-                        </svg>
-                        응원하기
-                    </button>
-                </form>
-            </div>
-        </div>
+<!--        <div class="bg-white rounded-2xl border border-stone overflow-hidden shadow-sm">-->
+<!--            <div class="px-6 py-3.5 border-b border-stone flex items-center gap-2">-->
+<!--                <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
+<!--                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>-->
+<!--                </svg>-->
+<!--                <span class="font-bold text-sm text-ink">응원글 작성</span>-->
+<!--            </div>-->
+<!--            <div class="px-6 py-5">-->
+<!--                <form id="cheer-form" class="space-y-4">-->
+<!--                    {% csrf_token %}-->
+<!--                    <div>-->
+<!--                        <label class="block text-xs font-semibold text-smoke mb-1.5">이름</label>-->
+<!--                        {{ cheer_form.author_name }}-->
+<!--                    </div>-->
+<!--                    <div>-->
+<!--                        <label class="block text-xs font-semibold text-smoke mb-1.5">응원 메시지</label>-->
+<!--                        {{ cheer_form.content }}-->
+<!--                    </div>-->
+<!--                    <button type="submit" id="cheer-submit-btn"-->
+<!--                            class="inline-flex items-center gap-2 bg-accent text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-red-700 transition-all hover:shadow-md disabled:opacity-60">-->
+<!--                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">-->
+<!--                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>-->
+<!--                        </svg>-->
+<!--                        응원하기-->
+<!--                    </button>-->
+<!--                </form>-->
+<!--            </div>-->
+<!--        </div>-->
 
         {# 목록으로 #}
         <div class="text-center pt-4 pb-2">
@@ -408,7 +425,7 @@
                     공익제보 아카이브
                 </div>
                 <p class="text-white/50 text-sm leading-relaxed max-w-md">
-                    참여연대 공익법센터가 운영하는 공익제보자 데이터베이스입니다.<br>
+                    참여연대 공익제보지원센터가 운영하는 공익제보자 데이터베이스입니다.<br>
                     더 나은 공익제보자 보호제도를 만들기 위한 기초 자료로 활용됩니다.
                 </p>
             </div>

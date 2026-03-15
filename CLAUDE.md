@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-공익제보 아카이브 (Public Whistleblower Archive) — 참여연대 공익법센터에서 운영하는 공익제보자 사건 기록 및 관리 시스템. Django 4.0.7 기반, 공개 사이트와 관리자 패널 이중 구조.
+공익제보 아카이브 (Public Whistleblower Archive) — 참여연대 공익제보지원센터에서 운영하는 공익제보자 사건 기록 및 관리 시스템. Django 4.0.7 기반, 공개 사이트와 관리자 패널 이중 구조.
 
 ## Commands
 
