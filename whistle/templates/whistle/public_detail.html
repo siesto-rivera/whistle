@@ -339,7 +339,15 @@
         </div>
         {% endif %}
 
-        <div id="disqus_thread" class="mt-8 bg-white rounded-2xl border border-stone overflow-hidden shadow-sm p-6"></div>
+        <div class="mt-8 bg-white rounded-2xl border border-stone overflow-hidden shadow-sm">
+            <div class="px-6 py-3.5 border-b border-stone flex items-center gap-2">
+                <svg class="w-4 h-4 text-accent" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                </svg>
+                <span class="font-bold text-sm text-ink">응원하기</span>
+            </div>
+            <div id="disqus_thread" class="px-6 py-5"></div>
+        </div>
         <script>
             var disqus_config = function () {
                 this.page.url = '{{ request.build_absolute_uri }}';
