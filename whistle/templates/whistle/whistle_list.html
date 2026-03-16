@@ -11,22 +11,30 @@
             <a href="{% url 'whistle:case_list' %}" class="btn btn-outline-secondary ms-1" title="초기화"><i class="bi bi-x-lg"></i></a>
         {% endif %}
     </form>
+    <a href="{% url 'whistle:case_excel' %}" class="btn btn-success"><i class="bi bi-file-earmark-excel me-1"></i>엑셀</a>
     <a href="{% url 'whistle:case_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>추가</a>
     </div>
 </div>
 
 <div class="mb-2">
     <small class="text-muted fw-bold me-2">공익침해분야</small>
-    <a href="{% url 'whistle:case_list' %}{% if current_organization %}?organization={{ current_organization }}{% endif %}" class="btn btn-sm {% if not current_category %}btn-dark{% else %}btn-outline-secondary{% endif %} me-1 mb-1">전체</a>
+    <a href="{% url 'whistle:case_list' %}{% if current_organization %}?organization={{ current_organization }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}" class="btn btn-sm {% if not current_category %}btn-dark{% else %}btn-outline-secondary{% endif %} me-1 mb-1">전체</a>
     {% for value, label in categories %}
-        <a href="{% url 'whistle:case_list' %}?category={{ value }}{% if current_organization %}&organization={{ current_organization }}{% endif %}" class="btn btn-sm {% if current_category == value %}btn-dark{% else %}btn-outline-secondary{% endif %} me-1 mb-1">{{ label }}</a>
+        <a href="{% url 'whistle:case_list' %}?category={{ value }}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}" class="btn btn-sm {% if current_category == value %}btn-dark{% else %}btn-outline-secondary{% endif %} me-1 mb-1">{{ label }}</a>
+    {% endfor %}
+</div>
+<div class="mb-2">
+    <small class="text-muted fw-bold me-2">신고대상</small>
+    <a href="{% url 'whistle:case_list' %}{% if current_category %}?category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}" class="btn btn-sm {% if not current_organization %}btn-dark{% else %}btn-outline-secondary{% endif %} me-1 mb-1">전체</a>
+    {% for value, label in organizations %}
+        <a href="{% url 'whistle:case_list' %}?organization={{ value }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}" class="btn btn-sm {% if current_organization == value %}btn-dark{% else %}btn-outline-secondary{% endif %} me-1 mb-1">{{ label }}</a>
     {% endfor %}
 </div>
 <div class="mb-3">
-    <small class="text-muted fw-bold me-2">신고대상</small>
-    <a href="{% url 'whistle:case_list' %}{% if current_category %}?category={{ current_category }}{% endif %}" class="btn btn-sm {% if not current_organization %}btn-dark{% else %}btn-outline-secondary{% endif %} me-1 mb-1">전체</a>
-    {% for value, label in organizations %}
-        <a href="{% url 'whistle:case_list' %}?organization={{ value }}{% if current_category %}&category={{ current_category }}{% endif %}" class="btn btn-sm {% if current_organization == value %}btn-dark{% else %}btn-outline-secondary{% endif %} me-1 mb-1">{{ label }}</a>
+    <small class="text-muted fw-bold me-2">주요태그</small>
+    <a href="{% url 'whistle:case_list' %}{% if current_category %}?category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}" class="btn btn-sm {% if not current_tag %}btn-dark{% else %}btn-outline-secondary{% endif %} me-1 mb-1">전체</a>
+    {% for tag in all_tags %}
+        <a href="{% url 'whistle:case_list' %}?tag={{ tag|urlencode }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}" class="btn btn-sm {% if current_tag == tag %}btn-dark{% else %}btn-outline-secondary{% endif %} me-1 mb-1">{{ tag }}</a>
     {% endfor %}
 </div>
 
@@ -55,6 +63,9 @@
                 <th scope="col">대상기관</th>
                 <th scope="col">침해영역</th>
                 <th scope="col">주요태그</th>
+                <th scope="col">공익제보자상</th>
+                <th scope="col">위반행위</th>
+                <th scope="col">불이익상세</th>
                 <th scope="col">
                     <a href="?sort={% if current_sort == 'hide_asc' %}hide_desc{% else %}hide_asc{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="text-white text-decoration-none">
                         비공개
@@ -75,6 +86,9 @@
                 <td>{{ case.organization }}</td>
                 <td>{% if case.category %}<span class="badge bg-info">{{ case.category }}</span>{% else %}-{% endif %}</td>
                 <td>{{ case.tags }}</td>
+                <td>{% if case.prize %}<span class="badge bg-warning text-dark">수상</span>{% endif %}</td>
+                <td class="small">{{ case.hidden_violation|truncatechars:30 }}</td>
+                <td class="small">{{ case.hidden_disadvantage|truncatechars:30 }}</td>
                 <td>
                     {% if case.hide %}
                         <span class="badge bg-secondary">비공개</span>
@@ -82,7 +96,7 @@
                 </td>
             </tr>
         {% empty %}
-            <tr><td colspan="8" class="text-center text-muted py-4">데이터가 없습니다.</td></tr>
+            <tr><td colspan="11" class="text-center text-muted py-4">데이터가 없습니다.</td></tr>
         {% endfor %}
         </tbody>
     </table>

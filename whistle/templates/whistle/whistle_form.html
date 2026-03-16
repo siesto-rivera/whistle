@@ -14,7 +14,7 @@
             {% csrf_token %}
             {% for field in form %}
                 <div class="mb-3">
-                    {% if field.name == "hide" %}
+                    {% if field.name == "hide" or field.name == "prize" %}
                         <div class="form-check">
                             {{ field }}
                             <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -26,6 +26,19 @@
                             <input type="text" id="tag-input" class="border-0 flex-grow-1" style="outline:none; min-width:120px;" placeholder="태그 입력 후 Enter" autocomplete="off">
                         </div>
                         <div id="tag-suggestions" class="list-group position-relative" style="z-index:10;"></div>
+                    {% elif field.name in "situation,awards,support,media_coverage,media_detail,media_photo,quote,hidden_violation,hidden_disadvantage,memo" %}
+                        <div class="border rounded">
+                            <div class="px-3 py-2 bg-light d-flex align-items-center" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#collapse-{{ field.name }}">
+                                <i class="bi bi-chevron-right me-2 collapse-icon-{{ field.name }}"></i>
+                                <span class="fw-bold">{{ field.label }}</span>
+                                {% if field.value|striptags|truncatewords:1 != "" %}<span class="badge bg-primary bg-opacity-10 text-primary ms-2">입력됨</span>{% endif %}
+                            </div>
+                            <div class="collapse {% if field.value|striptags|truncatewords:1 != "" %}show{% endif %}" id="collapse-{{ field.name }}">
+                                <div class="p-3 pt-0">
+                                    {{ field }}
+                                </div>
+                            </div>
+                        </div>
                     {% else %}
                         <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
                         {{ field }}
@@ -47,6 +60,13 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bi-chevron-right { transition: transform 0.2s; }
+    .bi-chevron-right.open { transform: rotate(90deg); }
+</style>
 {% endblock %}
 
 {% block extra_js %}
@@ -155,5 +175,15 @@
 
     init();
 })();
+
+/* 접힘/펼침 아이콘 회전 */
+document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(el) {
+    var target = document.querySelector(el.dataset.bsTarget);
+    var icon = el.querySelector('.bi-chevron-right');
+    if (!target || !icon) return;
+    if (target.classList.contains('show')) icon.classList.add('open');
+    target.addEventListener('show.bs.collapse', function() { icon.classList.add('open'); });
+    target.addEventListener('hide.bs.collapse', function() { icon.classList.remove('open'); });
+});
 </script>
 {% endblock %}

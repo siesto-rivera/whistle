@@ -134,6 +134,69 @@
     </div>
 </div>
 
+{# ── 불이익상세 / 위반행위 / 공익제보자상 통계 ── #}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 fw-bold pt-3">
+                <i class="bi bi-exclamation-triangle me-1"></i>불이익상세 현황
+            </div>
+            <div class="card-body pt-0" style="max-height:300px; overflow-y:auto;">
+                {% for item, count in disadvantage_stats %}
+                <div class="d-flex justify-content-between align-items-center py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                    <span class="small">{{ item|truncatechars:40 }}</span>
+                    <span class="badge bg-danger bg-opacity-10 text-danger">{{ count }}건</span>
+                </div>
+                {% empty %}
+                <p class="text-muted small mb-0">데이터 없음</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 fw-bold pt-3">
+                <i class="bi bi-shield-exclamation me-1"></i>위반행위 현황
+            </div>
+            <div class="card-body pt-0" style="max-height:300px; overflow-y:auto;">
+                {% for item, count in violation_stats %}
+                <div class="d-flex justify-content-between align-items-center py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                    <span class="small">{{ item|truncatechars:40 }}</span>
+                    <span class="badge bg-warning bg-opacity-10 text-warning">{{ count }}건</span>
+                </div>
+                {% empty %}
+                <p class="text-muted small mb-0">데이터 없음</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 fw-bold pt-3 d-flex justify-content-between">
+                <span><i class="bi bi-trophy me-1"></i>참여연대 공익제보자상 수상</span>
+                <span class="badge bg-success bg-opacity-10 text-success">{{ prize_total }}건</span>
+            </div>
+            <div class="card-body pt-0" style="max-height:300px; overflow-y:auto;">
+                {% for case in prize_cases %}
+                <div class="py-2 {% if not forloop.last %}border-bottom{% endif %}">
+                    <a href="{% url 'whistle:case_detail' case.pk %}" class="text-decoration-none fw-semibold small">
+                        {{ case.title }}
+                    </a>
+                    <div class="d-flex gap-2 mt-1">
+                        {% if case.case_year %}<span class="text-muted" style="font-size:0.75rem;">{{ case.case_year }}</span>{% endif %}
+                        {% if case.whistleblower %}<span class="text-muted" style="font-size:0.75rem;">{{ case.whistleblower }}</span>{% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small mb-0">데이터 없음</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
 {# ── 빠른 메뉴 ── #}
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-header bg-white border-0 fw-bold pt-3">

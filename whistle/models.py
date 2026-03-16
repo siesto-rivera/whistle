@@ -27,7 +27,7 @@ class WhistleCase(models.Model):
     whistleblower = models.CharField("제보자 성명", max_length=100, default="")
     organization = models.CharField("신고대상", max_length=50, choices=ORGANIZATION_CHOICES, default="")
     category = models.CharField("공익침해분야", max_length=50, choices=CATEGORY_CHOICES, default="")
-    tags = models.CharField("주요태그", max_length=255, default="")
+    tags = models.CharField("주요태그", max_length=255, default="", blank=True)
     content = models.TextField("제보내용", blank=True)
     situation = models.TextField("제보자 상황", blank=True)
     awards = models.TextField("수상이력", blank=True)
@@ -38,6 +38,7 @@ class WhistleCase(models.Model):
     quote = models.TextField("제보자 한마디", blank=True)
     hidden_violation = models.TextField("위반행위", blank=True)
     hidden_disadvantage = models.TextField("불이익상세", blank=True)
+    prize = models.BooleanField("참여연대 공익제보자상 수상", default=False)
     memo = models.TextField("참고", blank=True)
     hide = models.BooleanField("비공개", default=False)
 

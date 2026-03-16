@@ -57,6 +57,7 @@
             border-bottom: none;
         }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
@@ -125,6 +126,21 @@
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'tag_stats' %}active{% endif %}" href="{% url 'whistle:tag_stats' %}">
                     <i class="bi bi-tags me-1"></i>태그 통계
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'disadvantage_stats' %}active{% endif %}" href="{% url 'whistle:disadvantage_stats' %}">
+                    <i class="bi bi-exclamation-triangle me-1"></i>불이익상세
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'violation_stats' %}active{% endif %}" href="{% url 'whistle:violation_stats' %}">
+                    <i class="bi bi-shield-exclamation me-1"></i>위반행위
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'prize_stats' %}active{% endif %}" href="{% url 'whistle:prize_stats' %}">
+                    <i class="bi bi-trophy me-1"></i>공익제보자상
                 </a>
             </li>
         </ul>

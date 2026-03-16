@@ -7,6 +7,11 @@ from .models import WhistleCase, WhistleTimeline, WhistleArticle, WhistleCheer
 
 
 class WhistleCaseForm(forms.ModelForm):
+    STRIP_IF_BLANK = [
+        "situation", "awards", "support", "media_coverage", "media_detail",
+        "media_photo", "quote", "hidden_violation", "hidden_disadvantage", "memo",
+    ]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         current_year = date.today().year
@@ -15,6 +20,15 @@ class WhistleCaseForm(forms.ModelForm):
         choices = [("", "---------")] + [(str(y), str(y)) for y in range(start, current_year + 1)]
         self.fields["case_year"].widget = forms.Select(attrs={"class": "form-select"}, choices=choices)
 
+    def clean(self):
+        from django.utils.html import strip_tags
+        cleaned = super().clean()
+        for field in self.STRIP_IF_BLANK:
+            val = cleaned.get(field, "")
+            if val and not strip_tags(val).strip():
+                cleaned[field] = ""
+        return cleaned
+
     class Meta:
         model = WhistleCase
         fields = [
@@ -22,7 +36,7 @@ class WhistleCaseForm(forms.ModelForm):
             "category", "tags", "content", "situation",
             "awards", "support", "media_coverage", "media_detail",
             "media_photo", "quote", "hidden_violation",
-            "hidden_disadvantage", "memo", "hide",
+            "hidden_disadvantage", "prize", "memo", "hide",
         ]
         widgets = {
             "thumbnail": forms.ClearableFileInput(attrs={"class": "form-control"}),
@@ -43,6 +57,7 @@ class WhistleCaseForm(forms.ModelForm):
             "hidden_violation": SummernoteWidget(),
             "hidden_disadvantage": SummernoteWidget(),
             "memo": SummernoteWidget(),
+            "prize": forms.CheckboxInput(attrs={"class": "form-check-input"}),
             "hide": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 

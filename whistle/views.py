@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import formats
@@ -61,15 +61,31 @@ class PublicWhistleListView(ListView):
             queryset = queryset.filter(category=category)
         if organization:
             queryset = queryset.filter(organization=organization)
+        tag = self.request.GET.get("tag", "").strip()
+        if tag:
+            queryset = queryset.filter(tags__icontains=tag)
         return queryset
+
+    def _all_tags(self):
+        tags = set()
+        for val in WhistleCase.objects.filter(hide=False).values_list("tags", flat=True):
+            if not val:
+                continue
+            for t in val.split(","):
+                t = t.strip()
+                if t:
+                    tags.add(t)
+        return sorted(tags)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["q"] = self.request.GET.get("q", "").strip()
         context["current_category"] = self.request.GET.get("category", "").strip()
         context["current_organization"] = self.request.GET.get("organization", "").strip()
+        context["current_tag"] = self.request.GET.get("tag", "").strip()
         context["categories"] = WhistleCase.CATEGORY_CHOICES
         context["organizations"] = WhistleCase.ORGANIZATION_CHOICES
+        context["all_tags"] = self._all_tags()
         return context
 
 
@@ -143,12 +159,111 @@ class WhistleDashboardView(LoginRequiredMixin, TemplateView):
         )
         # 카테고리별 건수
         from django.db.models import Count
+        from collections import Counter
         context["category_stats"] = (
             WhistleCase.objects.filter(hide=False)
             .values("category")
             .annotate(count=Count("id"))
             .order_by("-count")
         )
+        # 불이익상세 통계
+        from django.utils.html import strip_tags
+        disadvantage_counter = Counter()
+        for val in WhistleCase.objects.exclude(hidden_disadvantage="").values_list("hidden_disadvantage", flat=True):
+            text = strip_tags(val).strip()
+            if text:
+                for line in text.replace("<br>", "\n").split("\n"):
+                    line = line.strip().strip("-").strip()
+                    if line:
+                        disadvantage_counter[line] += 1
+        context["disadvantage_stats"] = disadvantage_counter.most_common()
+        # 위반행위 통계
+        violation_counter = Counter()
+        for val in WhistleCase.objects.exclude(hidden_violation="").values_list("hidden_violation", flat=True):
+            text = strip_tags(val).strip()
+            if text:
+                for line in text.replace("<br>", "\n").split("\n"):
+                    line = line.strip().strip("-").strip()
+                    if line:
+                        violation_counter[line] += 1
+        context["violation_stats"] = violation_counter.most_common()
+        # 공익제보자상 수상 통계
+        context["prize_total"] = WhistleCase.objects.filter(prize=True).count()
+        context["prize_cases"] = WhistleCase.objects.filter(prize=True).order_by("-case_year", "-id")
+        return context
+
+
+# ── 불이익상세 통계 ────────────────────────────────────────────────
+
+
+class DisadvantageStatsView(LoginRequiredMixin, TemplateView):
+    template_name = "whistle/disadvantage_stats.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from collections import Counter
+        from django.utils.html import strip_tags
+        counter = Counter()
+        case_map = {}
+        for case in WhistleCase.objects.exclude(hidden_disadvantage=""):
+            text = strip_tags(case.hidden_disadvantage).strip()
+            if not text:
+                continue
+            for line in text.replace("<br>", "\n").split("\n"):
+                line = line.strip().strip("-").strip()
+                if line:
+                    counter[line] += 1
+                    case_map.setdefault(line, []).append(case)
+        selected = self.request.GET.get("item", "").strip()
+        context["stats"] = counter.most_common()
+        context["total_items"] = len(counter)
+        context["selected_item"] = selected
+        if selected and selected in case_map:
+            context["filtered_cases"] = case_map[selected]
+        return context
+
+
+# ── 위반행위 통계 ─────────────────────────────────────────────────
+
+
+class ViolationStatsView(LoginRequiredMixin, TemplateView):
+    template_name = "whistle/violation_stats.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from collections import Counter
+        from django.utils.html import strip_tags
+        counter = Counter()
+        case_map = {}
+        for case in WhistleCase.objects.exclude(hidden_violation=""):
+            text = strip_tags(case.hidden_violation).strip()
+            if not text:
+                continue
+            for line in text.replace("<br>", "\n").split("\n"):
+                line = line.strip().strip("-").strip()
+                if line:
+                    counter[line] += 1
+                    case_map.setdefault(line, []).append(case)
+        selected = self.request.GET.get("item", "").strip()
+        context["stats"] = counter.most_common()
+        context["total_items"] = len(counter)
+        context["selected_item"] = selected
+        if selected and selected in case_map:
+            context["filtered_cases"] = case_map[selected]
+        return context
+
+
+# ── 공익제보자상 통계 ─────────────────────────────────────────────
+
+
+class PrizeStatsView(LoginRequiredMixin, TemplateView):
+    template_name = "whistle/prize_stats.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["prize_cases"] = WhistleCase.objects.filter(prize=True).order_by("-case_year", "-id")
+        context["prize_total"] = context["prize_cases"].count()
+        context["total_cases"] = WhistleCase.objects.count()
         return context
 
 
@@ -187,6 +302,64 @@ class TagStatsView(LoginRequiredMixin, TemplateView):
         return context
 
 
+# ── 엑셀 다운로드 ──────────────────────────────────────────────────
+
+
+@login_required
+def case_excel_download(request):
+    import openpyxl
+    from openpyxl.utils import get_column_letter
+    from django.utils.html import strip_tags
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "공익제보 사건"
+
+    headers = [
+        "ID", "사건명", "제보년도", "제보자 성명", "신고대상",
+        "공익침해분야", "주요태그", "제보내용", "제보자 상황",
+        "수상이력", "참여연대 지원", "미디어_언론보도", "언론보도 내역",
+        "미디어_사진", "제보자 한마디", "위반행위", "불이익상세",
+        "참고", "비공개",
+    ]
+    ws.append(headers)
+
+    # 헤더 스타일
+    for col in range(1, len(headers) + 1):
+        cell = ws.cell(row=1, column=col)
+        cell.font = openpyxl.styles.Font(bold=True)
+
+    for case in WhistleCase.objects.order_by("-case_year", "-id"):
+        ws.append([
+            case.id,
+            case.title,
+            case.case_year,
+            case.whistleblower,
+            case.organization,
+            case.category,
+            case.tags,
+            strip_tags(case.content),
+            strip_tags(case.situation),
+            strip_tags(case.awards),
+            strip_tags(case.support),
+            strip_tags(case.media_coverage),
+            strip_tags(case.media_detail),
+            strip_tags(case.media_photo),
+            strip_tags(case.quote),
+            strip_tags(case.hidden_violation),
+            strip_tags(case.hidden_disadvantage),
+            strip_tags(case.memo),
+            "Y" if case.hide else "N",
+        ])
+
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = 'attachment; filename="whistle_cases.xlsx"'
+    wb.save(response)
+    return response
+
+
 # ── 공익제보 사건 ─────────────────────────────────────────────────
 
 
@@ -220,16 +393,32 @@ class WhistleCaseListView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(category=category)
         if organization:
             queryset = queryset.filter(organization=organization)
+        tag = self.request.GET.get("tag", "").strip()
+        if tag:
+            queryset = queryset.filter(tags__icontains=tag)
         return queryset
+
+    def _all_tags(self):
+        tags = set()
+        for val in WhistleCase.objects.values_list("tags", flat=True):
+            if not val:
+                continue
+            for t in val.split(","):
+                t = t.strip()
+                if t:
+                    tags.add(t)
+        return sorted(tags)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["q"] = self.request.GET.get("q", "").strip()
         context["current_category"] = self.request.GET.get("category", "").strip()
         context["current_organization"] = self.request.GET.get("organization", "").strip()
+        context["current_tag"] = self.request.GET.get("tag", "").strip()
         context["current_sort"] = self.request.GET.get("sort", "year_desc")
         context["categories"] = WhistleCase.CATEGORY_CHOICES
         context["organizations"] = WhistleCase.ORGANIZATION_CHOICES
+        context["all_tags"] = self._all_tags()
         return context
 
 

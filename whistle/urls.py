@@ -9,9 +9,13 @@ urlpatterns = [
     # API
     path("api/whistle-search/", views.whistle_search_api, name="whistle_search_api"),
     path("api/tags/", views.tag_list_api, name="tag_list_api"),
-    # 태그 통계
+    # 통계
     path("tags/", views.TagStatsView.as_view(), name="tag_stats"),
+    path("stats/disadvantage/", views.DisadvantageStatsView.as_view(), name="disadvantage_stats"),
+    path("stats/violation/", views.ViolationStatsView.as_view(), name="violation_stats"),
+    path("stats/prize/", views.PrizeStatsView.as_view(), name="prize_stats"),
     # 공익제보 사건
+    path("cases/excel/", views.case_excel_download, name="case_excel"),
     path("cases/", views.WhistleCaseListView.as_view(), name="case_list"),
     path("<int:pk>/", views.WhistleCaseDetailView.as_view(), name="case_detail"),
     path("create/", views.WhistleCaseCreateView.as_view(), name="case_create"),

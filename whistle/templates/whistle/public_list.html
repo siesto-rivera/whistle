@@ -136,13 +136,13 @@
             <div class="flex flex-col gap-2">
                 <div class="flex flex-wrap gap-2 items-center">
                     <span class="text-xs text-smoke font-bold mr-1">공익침해분야</span>
-                    <a href="{% url 'whistle_public_list' %}{% if current_organization %}?organization={{ current_organization }}{% endif %}"
+                    <a href="{% url 'whistle_public_list' %}{% if current_organization or current_tag %}?{% if current_organization %}organization={{ current_organization }}{% endif %}{% if current_organization and current_tag %}&{% endif %}{% if current_tag %}tag={{ current_tag|urlencode }}{% endif %}{% endif %}"
                        class="text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
                        {% if not current_category %}bg-accent text-white border-accent{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
                         전체
                     </a>
                     {% for value, label in categories %}
-                    <a href="{% url 'whistle_public_list' %}?category={{ value }}{% if current_organization %}&organization={{ current_organization }}{% endif %}"
+                    <a href="{% url 'whistle_public_list' %}?category={{ value }}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
                        class="text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
                        {% if current_category == value %}bg-accent text-white border-accent{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
                         {{ label }}
@@ -151,16 +151,31 @@
                 </div>
                 <div class="flex flex-wrap gap-2 items-center">
                     <span class="text-xs text-smoke font-bold mr-1">신고대상</span>
-                    <a href="{% url 'whistle_public_list' %}{% if current_category %}?category={{ current_category }}{% endif %}"
+                    <a href="{% url 'whistle_public_list' %}{% if current_category or current_tag %}?{% if current_category %}category={{ current_category }}{% endif %}{% if current_category and current_tag %}&{% endif %}{% if current_tag %}tag={{ current_tag|urlencode }}{% endif %}{% endif %}"
                        class="text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
                        {% if not current_organization %}bg-accent text-white border-accent{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
                         전체
                     </a>
                     {% for value, label in organizations %}
-                    <a href="{% url 'whistle_public_list' %}?organization={{ value }}{% if current_category %}&category={{ current_category }}{% endif %}"
+                    <a href="{% url 'whistle_public_list' %}?organization={{ value }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
                        class="text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
                        {% if current_organization == value %}bg-accent text-white border-accent{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
                         {{ label }}
+                    </a>
+                    {% endfor %}
+                </div>
+                <div class="flex flex-wrap gap-2 items-center">
+                    <span class="text-xs text-smoke font-bold mr-1">주요태그</span>
+                    <a href="{% url 'whistle_public_list' %}{% if current_category or current_organization %}?{% if current_category %}category={{ current_category }}{% endif %}{% if current_category and current_organization %}&{% endif %}{% if current_organization %}organization={{ current_organization }}{% endif %}{% endif %}"
+                       class="text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
+                       {% if not current_tag %}bg-accent text-white border-accent{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
+                        전체
+                    </a>
+                    {% for tag in all_tags %}
+                    <a href="{% url 'whistle_public_list' %}?tag={{ tag|urlencode }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}"
+                       class="text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
+                       {% if current_tag == tag %}bg-accent text-white border-accent{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
+                        {{ tag }}
                     </a>
                     {% endfor %}
                 </div>
@@ -173,6 +188,9 @@
                 {% endif %}
                 {% if current_organization %}
                     <input type="hidden" name="organization" value="{{ current_organization }}">
+                {% endif %}
+                {% if current_tag %}
+                    <input type="hidden" name="tag" value="{{ current_tag }}">
                 {% endif %}
                 <input type="text" name="q" value="{{ q }}" placeholder="사건명 / 제보자 / 태그 검색"
                        class="text-sm border border-stone border-r-0 rounded-l-full px-4 py-1.5 bg-white text-ink placeholder-smoke focus:outline-none focus:border-accent w-44"/>
@@ -193,11 +211,12 @@
     <div class="max-w-6xl mx-auto px-6">
 
         {# 검색 결과 안내 #}
-        {% if q or current_category or current_organization %}
+        {% if q or current_category or current_organization or current_tag %}
         <p class="text-sm text-smoke mb-8">
             {% if q %}<strong class="text-ink">"{{ q }}"</strong> 검색 결과&nbsp;{% endif %}
             {% if current_category %}<span class="inline-block bg-rose-soft text-accent text-xs font-semibold px-2.5 py-0.5 rounded-full border border-accent/10">{{ current_category }}</span>&nbsp;{% endif %}
             {% if current_organization %}<span class="inline-block bg-rose-soft text-accent text-xs font-semibold px-2.5 py-0.5 rounded-full border border-accent/10">{{ current_organization }}</span>&nbsp;{% endif %}
+            {% if current_tag %}<span class="inline-block bg-rose-soft text-accent text-xs font-semibold px-2.5 py-0.5 rounded-full border border-accent/10">{{ current_tag }}</span>&nbsp;{% endif %}
             — {{ page_obj.paginator.count }}건
             <a href="{% url 'whistle_public_list' %}" class="ml-2 text-accent hover:underline text-xs">초기화</a>
         </p>
@@ -258,9 +277,9 @@
         {% if page_obj.has_other_pages %}
         <nav class="mt-12 flex justify-center items-center gap-1">
             {% if page_obj.has_previous %}
-                <a href="?page=1{% if q %}&q={{ q }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}"
+                <a href="?page=1{% if q %}&q={{ q }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
                    class="w-9 h-9 flex items-center justify-center rounded-full border border-stone text-smoke hover:border-accent hover:text-accent transition-all text-sm">&laquo;</a>
-                <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}"
+                <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
                    class="w-9 h-9 flex items-center justify-center rounded-full border border-stone text-smoke hover:border-accent hover:text-accent transition-all text-sm">&lsaquo;</a>
             {% endif %}
 
@@ -268,15 +287,15 @@
                 {% if page_obj.number == num %}
                     <span class="w-9 h-9 flex items-center justify-center rounded-full bg-accent text-white text-sm font-semibold">{{ num }}</span>
                 {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                    <a href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}"
+                    <a href="?page={{ num }}{% if q %}&q={{ q }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
                        class="w-9 h-9 flex items-center justify-center rounded-full border border-stone text-smoke hover:border-accent hover:text-accent transition-all text-sm">{{ num }}</a>
                 {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}"
+                <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
                    class="w-9 h-9 flex items-center justify-center rounded-full border border-stone text-smoke hover:border-accent hover:text-accent transition-all text-sm">&rsaquo;</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}"
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if q %}&q={{ q }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
                    class="w-9 h-9 flex items-center justify-center rounded-full border border-stone text-smoke hover:border-accent hover:text-accent transition-all text-sm">&raquo;</a>
             {% endif %}
         </nav>
