@@ -118,3 +118,6 @@ SUMMERNOTE_CONFIG = {
 }
 
 LOGIN_URL = "/admin/login/"
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = ["https://wb.peoplepower21.org"]

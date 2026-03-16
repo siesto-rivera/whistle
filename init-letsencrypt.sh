@@ -6,7 +6,7 @@ if ! [ -x "$(command -v docker-compose)" ]; then
 fi
 
 
-domains=(www.kptuwoom.org)
+domains=(wb.peoplepower21.org)
 rsa_key_size=4096
 data_path="./data/certbot"
 email="siesto.rivera@gmail.com" # Adding a valid address is strongly recommended

@@ -27,21 +27,13 @@ jobs:
           git reset --hard HEAD
           git pull
 
-          echo '>>> Rebuilding web image...'
-          sudo docker build -t whistle_web .
-
-          echo '>>> Restarting containers...'
-          sudo docker rm -f whistle_web whistle_nginx 2>/dev/null || true
-          sudo docker network create whistle_net 2>/dev/null || true
-
-          sudo docker run -d --name whistle_web --network whistle_net --network-alias web --env-file /github/whistle/.env.prod -v /github/whistle:/usr/src/app --restart unless-stopped whistle_web gunicorn config.wsgi:application --bind 0.0.0.0:8000
-
-          sudo docker run -d --name whistle_nginx --network whistle_net -p 80:80 --restart unless-stopped whistle_nginx
+          echo '>>> Rebuilding and restarting containers...'
+          sudo docker-compose up --build -d web nginx
 
           echo '>>> Collecting static files...'
-          sudo docker exec whistle_web python manage.py collectstatic --noinput || true
+          sudo docker-compose exec -T web python manage.py collectstatic --noinput || true
 
           echo '>>> Running migrations...'
-          sudo docker exec whistle_web python manage.py migrate --noinput || true
+          sudo docker-compose exec -T web python manage.py migrate --noinput || true
 
           echo '====== Deploy Complete ======'
