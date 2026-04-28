@@ -497,6 +497,14 @@ class WhistleCaseUpdateView(LoginRequiredMixin, UpdateView):
         return reverse_lazy("whistle:case_detail", kwargs={"pk": self.object.pk})
 
 
+@login_required
+@require_POST
+def whistle_case_delete(request, pk):
+    case = get_object_or_404(WhistleCase, pk=pk)
+    case.delete()
+    return redirect("whistle:case_list")
+
+
 # ── 타임라인 ─────────────────────────────────────────────────
 
 
