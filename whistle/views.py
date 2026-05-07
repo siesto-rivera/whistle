@@ -430,7 +430,7 @@ class WhistleCaseDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["timelines"] = WhistleTimeline.objects.filter(case=self.object).order_by("-rdate")
-        context["articles"] = WhistleArticle.objects.filter(case=self.object)
+        context["articles"] = WhistleArticle.objects.filter(case=self.object).order_by("-rdate")
         context["timeline_form"] = WhistleTimelineForm(initial={"case": self.object.pk})
         context["article_form"] = WhistleArticleForm(initial={"case": self.object.pk})
         return context
