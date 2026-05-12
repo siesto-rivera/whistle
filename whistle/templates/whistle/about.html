@@ -139,8 +139,8 @@
                 <p class="text-accent text-xs font-bold uppercase tracking-widest mb-3">Mission</p>
                 <h2 class="text-3xl font-extrabold text-ink mb-5 leading-tight">공익제보 아카이브란?</h2>
                 <p class="text-smoke leading-relaxed mb-4">
-                    공익제보 아카이브는 우리 사회를 더 나은 곳으로 이끈 공익제보자들을 기록하고 알리는 데이터베이스입니다.
-                    제보자들이 어떤 어려움을 겪었는지, 지금 어떻게 살아가고 있는지를 함께 기억합니다.
+                    공익제보 아카이브는 우리 사회를 더 나은 곳으로 이끈 공익제보 사건들과 공익제보자들을 기록하는 데이터베이스이자, 공익제보와 관련된 여러 자료와 소식을 공유하는 공간입니다.
+참여연대 공익제보지원센터는 참여연대에 소식을 알려오거나 사회에 널리 알려진 공익제보 사례를 모아  2010년부터 2024년까지 매년〈양심의 호루라기를 부는 사람들〉 이라는 이름으로 사례집을 발간하고, 공익제보자들과 공익제보자를 지원하는 시민단체 및 관련 기관에 배포해 왔습니다. 공익제보 아카이브는 이 〈양심의 호루라기를 부는 사람들〉에 수록된 사례를 기초로 만들어졌습니다.
                 </p>
                 <p class="text-smoke leading-relaxed">
                     정부·기업 부패와 비리를 세상에 알린 제보자들은 종종 보복과 고립을 겪습니다.
@@ -180,8 +180,8 @@
                               d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
                     </svg>
                 </div>
-                <h3 class="font-bold text-ink mb-2">사건 아카이브</h3>
-                <p class="text-sm text-smoke leading-relaxed">공익제보 사건을 카테고리·연도별로 검색하고 열람할 수 있습니다.</p>
+                <h3 class="font-bold text-ink mb-2">공익제보자를 기록합니다</h3>
+                <p class="text-sm text-smoke leading-relaxed">공익제보 내용과 결과, 공익제보자들의 현 상황을 기록하고 관련 기사 등을 함께 수록합니다. 공익제보 아카이브 수록 사례는 지속적으로 추가되고 업데이트됩니다.</p>
             </div>
 
             <div class="fade-section about-card bg-white rounded-2xl p-7 border border-stone">
@@ -191,8 +191,8 @@
                               d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
                 </div>
-                <h3 class="font-bold text-ink mb-2">응원하기</h3>
-                <p class="text-sm text-smoke leading-relaxed">시민 누구나 공익제보자에게 응원 메시지를 남길 수 있습니다.</p>
+                <h3 class="font-bold text-ink mb-2">공익제보자를 지원합니다</h3>
+                <p class="text-sm text-smoke leading-relaxed">공익제보자 보호·지원 제도 개선과 관련된 참여연대 공익제보지원센터 발간 자료집, 정책리포트 등 활동소식을 공유합니다.</p>
             </div>
 
             <div class="fade-section about-card bg-white rounded-2xl p-7 border border-stone">
@@ -202,8 +202,116 @@
                               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <h3 class="font-bold text-ink mb-2">타임라인</h3>
-                <p class="text-sm text-smoke leading-relaxed">각 사건의 전개 과정을 시간 순서로 정리하여 제공합니다.</p>
+                <h3 class="font-bold text-ink mb-2">공익제보자와 연대합니다</h3>
+                <p class="text-sm text-smoke leading-relaxed">공익제보자를 지지하고 함께할 수 있는 캠페인과 관련 행사 소식을 전해드립니다. 응원하고 싶은 공익제보 사례에 따뜻한 메시지도 남겨보세요.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+{# ══════════════════════════════════════════════ 사례 분류 기준 ══ #}
+<section class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-6">
+
+        <div class="fade-section mb-12">
+            <p class="text-accent text-xs font-bold uppercase tracking-widest mb-3">Classification</p>
+            <h2 class="text-3xl font-extrabold text-ink">사례 분류 기준</h2>
+        </div>
+
+        <div class="space-y-10">
+
+            {# 공익침해분야 #}
+            <div class="fade-section">
+                <h3 class="text-lg font-bold text-ink mb-2">공익침해분야</h3>
+                <p class="text-sm text-smoke leading-relaxed mb-5">공익제보로 드러난 문제가 어느 분야의 공익을 침해하고 있는지를 나타냅니다.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">인권·노동</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">개인의 생명, 자유, 기본권 침해, 노동권 침해 등</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">환경·건강·안전</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">환경 관련 규제 위반, 식품·의약품 안전·공중보건 위반, 산업재해 등</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">소비자이익·공정경쟁</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">소비자 피해, 입찰·계약 과정에서의 불공정거래 등</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">학사·연구부정</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">입시비리 등 학사부정, 교비횡령, 연구윤리 위반 등</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">민주주의·권한남용</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">정책·행정 절차의 불공정, 국가권력의 남용 등</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">공공재정</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">국가·공공재정의 횡령, 탈세 등</p>
+                    </div>
+                </div>
+            </div>
+
+            {# 신고대상 #}
+            <div class="fade-section">
+                <h3 class="text-lg font-bold text-ink mb-2">신고대상</h3>
+                <p class="text-sm text-smoke leading-relaxed mb-5">공익제보로 드러난 공익침해행위를 누가 저질렀는지를 보여줍니다.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">행정·공공기관</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">중앙정부 부처, 광역/기초자치단체, 공공기관, 공기업 등</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">군·정보기관</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">군, 국방부, 보안사, 국정원 등 국가안보 및 군 관련 기관</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">민간기업</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">사기업, 상업적 영리기관</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">교육기관</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">유치원, 초·중·고등학교, 대학교, 연구소/기관, 교육청 등</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">비영리단체</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">종교단체, 사회복지시설, 시민단체, NGO</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">수사·조사기관</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">감사원, 경찰, 검찰</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">기타</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+
+            {# 주요태그 #}
+            <div class="fade-section">
+                <h3 class="text-lg font-bold text-ink mb-2">주요태그</h3>
+                <p class="text-sm text-smoke leading-relaxed mb-5">공익제보 사례에서 중요하게 짚어볼 만한 키워드를 일부 선정했습니다. 향후 더 추가될 수 있습니다.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">책임감면</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">공익제보자가 형사책임을 감면받은 사례를 나타냅니다.</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">보상·포상</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">공익제보자가 제보로 인해 보상·포상을 받은 사례를 나타냅니다.</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">보호조치결정</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">국민권익위원회에서 보호조치(신분보장등조치) 결정을 받은 사례를 나타냅니다.</p>
+                    </div>
+                    <div class="bg-beige rounded-xl px-5 py-4 border border-stone">
+                        <span class="font-semibold text-sm text-ink">손해배상인정</span>
+                        <p class="text-xs text-smoke mt-1 leading-relaxed">공익제보자가 피신고자 등에게 손해배상을 요구하여 인정받은 사례를 나타냅니다.</p>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -223,15 +331,20 @@
         <div class="fade-section about-card bg-white rounded-2xl p-8 border border-stone max-w-2xl">
             <h3 class="font-bold text-lg text-ink mb-3">참여연대 공익제보지원센터</h3>
             <p class="text-sm text-smoke leading-relaxed mb-6">
-                참여연대 공익제보지원센터는 공익제보자 지원, 내부고발자 보호제도 개선, 부패 방지 입법 활동을 중심으로 활동합니다.
-                1994년 창립 이후 정부 지원금 없이 시민 회비만으로 운영되는 독립 시민단체입니다.
+                참여연대는 1994년 창립 시기부터 반부패 운동의 주요 핵심고리인 공익제보자를 보호하는 활동을 전개해 왔습니다. 현재 참여연대 공익제보지원센터는 공익제보자 보호 및 지원 활동, 공익제보자 보호 및 지원을 위한 법·제도 개선 운동 등을 진행하고 있습니다. 이와 더불어 매년 12월 우리 사회를 바꾼 공익제보자들을 선정해 〈올해의 공익제보자상〉을 시상합니다.
+</p>
+            <p class="text-sm text-smoke leading-relaxed mb-6">
+공익제보 아카이브에 수록된 정보는 정보 주체(제보자)의 동의를 받아 제공된 것이며, 이후 정보 주체의 요청이 있을 경우 참여연대는 해당 정보를 삭제하거나 비실명 처리할 예정입니다
+</p>
+            <p class="text-sm text-smoke leading-relaxed mb-6">
+공익제보 아카이브에 수록된 정보 활용, 정보수정, 삭제· 비실명 전환 등 관련 문의는 아래로 연락 바랍니다.
             </p>
             <div class="flex flex-wrap gap-6 text-sm text-smoke border-t border-stone pt-5">
                 <span class="flex items-center gap-1.5">
                     <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                     </svg>
-                    02-725-7104
+                    02-723-5302
                 </span>
                 <span class="flex items-center gap-1.5">
                     <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -241,7 +354,7 @@
                 </span>
                 <a href="https://www.peoplepower21.org" target="_blank"
                    class="flex items-center gap-1 text-accent font-semibold hover:underline">
-                    참여연대 바로가기
+                    바로가기
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                     </svg>
