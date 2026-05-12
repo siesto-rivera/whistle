@@ -20,12 +20,16 @@
                         sand:       '#F0EDE6',
                         stone:      '#E8E3DC',
                         ink:        '#2C2825',
-                        smoke:      '#8B847C',
+                        smoke:      'rgb(115 109 102)',
                         accent:     '#DC143C',
                         'rose-soft':'#FEF2F2',
                     },
                     fontFamily: {
                         sans: ['Pretendard Variable', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    },
+                    fontSize: {
+                        'xs': '0.8rem',
+                        'sm': '0.9rem',
                     },
                     animation: {
                         'pulse-soft': 'pulse-soft 2.5s ease-in-out infinite',
@@ -46,12 +50,29 @@
         body { background-color: #FAF9F5; }
 
         /* 섹션 카드 내 리치텍스트 스타일 */
+        .prose-content,
+        .prose-content * {
+            font-size: 15px !important;
+            font-family: 'Pretendard Variable', Pretendard, sans-serif !important;
+            color: #2C2825;
+            line-height: 1.5rem;
+
+        }
         .prose-content p   { margin-bottom: 0.75rem; line-height: 1.75; color: #4a4540; }
         .prose-content a   { color: #DC143C; text-decoration: underline; }
         .prose-content ul  { list-style: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; color: #4a4540; }
         .prose-content ol  { list-style: decimal; padding-left: 1.25rem; margin-bottom: 0.75rem; color: #4a4540; }
         .prose-content li  { margin-bottom: 0.25rem; }
         .prose-content strong { color: #2C2825; }
+
+        /* 제보자 한마디 */
+        blockquote .quote-text,
+        blockquote .quote-text * {
+            font-family: 'Pretendard Variable', Pretendard, sans-serif !important;
+            font-size: 16px !important;
+            word-break: keep-all !important;
+            line-height: 1.5 !important;
+        }
 
         /* 타임라인 */
         .timeline-item {
@@ -202,7 +223,7 @@
         {# 제보자 한마디 #}
         {% if case.quote %}
         <blockquote class="border-l-4 border-accent bg-rose-soft rounded-r-2xl px-6 py-5">
-            <p class="text-sm md:text-base text-ink leading-relaxed italic">{{ case.quote|safe }}</p>
+            <div class="quote-text text-ink">{{ case.quote|safe }}</div>
         </blockquote>
         {% endif %}
 

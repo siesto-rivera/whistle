@@ -1,4 +1,14 @@
 {% extends "layout.html" %}
+{% block extra_css %}
+.richtext-body {
+    font-size: 15px !important;
+    font-family: 'Pretendard Variable', Pretendard, sans-serif !important;
+}
+.richtext-body * {
+    font-size: 15px !important;
+    font-family: 'Pretendard Variable', Pretendard, sans-serif !important;
+}
+{% endblock %}
 {% block content %}
 
 <div class="d-flex justify-content-between align-items-center my-4">
@@ -29,28 +39,28 @@
 {% if case.content %}
 <div class="card mb-4">
     <div class="card-header"><strong>제보내용</strong></div>
-    <div class="card-body">{{ case.content|safe }}</div>
+    <div class="card-body richtext-body">{{ case.content|safe }}</div>
 </div>
 {% endif %}
 
 {% if case.situation %}
 <div class="card mb-4">
     <div class="card-header"><strong>제보자 상황</strong></div>
-    <div class="card-body">{{ case.situation|safe }}</div>
+    <div class="card-body richtext-body">{{ case.situation|safe }}</div>
 </div>
 {% endif %}
 
 {% if case.awards %}
 <div class="card mb-4">
     <div class="card-header"><strong>수상이력</strong></div>
-    <div class="card-body">{{ case.awards|safe }}</div>
+    <div class="card-body richtext-body">{{ case.awards|safe }}</div>
 </div>
 {% endif %}
 
 {% if case.support %}
 <div class="card mb-4">
     <div class="card-header"><strong>참여연대 지원</strong></div>
-    <div class="card-body">{{ case.support|safe }}</div>
+    <div class="card-body richtext-body">{{ case.support|safe }}</div>
 </div>
 {% endif %}
 
