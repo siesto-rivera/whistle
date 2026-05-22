@@ -1,5 +1,11 @@
+import json
+import urllib.parse
+import urllib.request
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import cache
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -10,6 +16,30 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, T
 
 from .forms import WhistleCaseForm, WhistleTimelineForm, WhistleArticleForm, WhistleCheerForm
 from .models import WhistleCase, WhistleTimeline, WhistleArticle, WhistleCheer
+
+
+def _get_disqus_comment_count():
+    cached = cache.get("disqus_total_posts")
+    if cached is not None:
+        return cached
+    try:
+        count = 0
+        cursor = None
+        while True:
+            params = {"forum": "wb-archive", "api_key": settings.DISQUS_API_KEY, "limit": 100}
+            if cursor:
+                params["cursor"] = cursor
+            url = "https://disqus.com/api/3.0/posts/list.json?" + urllib.parse.urlencode(params)
+            with urllib.request.urlopen(url, timeout=5) as resp:
+                data = json.loads(resp.read())
+            count += len(data["response"])
+            if not data.get("cursor", {}).get("more"):
+                break
+            cursor = data["cursor"]["next"]
+    except Exception:
+        count = 0
+    cache.set("disqus_total_posts", count, 3600)
+    return count
 
 
 # ── 공개 페이지 (로그인 불필요) ────────────────────────────────
@@ -27,7 +57,7 @@ class WhistleHomeView(TemplateView):
         context["recent_cases"] = WhistleCase.objects.filter(hide=False).order_by("-case_year", "-id")[:6]
         context["recent_cheers"] = WhistleCheer.objects.select_related("case").order_by("-created_at")[:6]
         context["total_cases"] = WhistleCase.objects.filter(hide=False).count()
-        context["total_cheers"] = WhistleCheer.objects.count()
+        context["total_cheers"] = _get_disqus_comment_count()
         return context
 
 

@@ -1,163 +1,78 @@
+{% extends "whistle/layout_whistle_public.html" %}
 {% load static %}
-<!doctype html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="description" content="{{ case.title }} - 공익제보 아카이브 참여연대"/>
-    <title>{{ case.title }} - 공익제보 아카이브</title>
-    <link rel="icon" type="image/svg+xml" href="{% static 'whistle/img/illust_whistle.svg' %}">
 
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"/>
+{% block head_title %}{{ case.title }} - 공익제보 아카이브{% endblock %}
+{% block head_description %}{{ case.title }} - 공익제보 아카이브 참여연대{% endblock %}
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        beige:      '#FAF9F5',
-                        sand:       '#F0EDE6',
-                        stone:      '#E8E3DC',
-                        ink:        '#2C2825',
-                        smoke:      'rgb(115 109 102)',
-                        accent:     '#DC143C',
-                        'rose-soft':'#FEF2F2',
-                    },
-                    fontFamily: {
-                        sans: ['Pretendard Variable', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                    },
-                    fontSize: {
-                        'xs': '0.8rem',
-                        'sm': '0.9rem',
-                    },
-                    animation: {
-                        'pulse-soft': 'pulse-soft 2.5s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        'pulse-soft': {
-                            '0%, 100%': { opacity: '1' },
-                            '50%':      { opacity: '0.5' },
-                        },
-                    },
-                }
-            }
-        }
-    </script>
+{% block extra_css %}
+<style>
+    /* 섹션 카드 내 리치텍스트 스타일 */
+    .prose-content,
+    .prose-content * {
+        font-size: 15px !important;
+        font-family: 'Pretendard Variable', Pretendard, sans-serif !important;
+        color: #2C2825;
+        line-height: 1.5rem;
+    }
+    .prose-content p   { margin-bottom: 0.75rem; line-height: 1.75; color: #4a4540; }
+    .prose-content a   { color: #DC143C; text-decoration: underline; }
+    .prose-content ul  { list-style: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; color: #4a4540; }
+    .prose-content ol  { list-style: decimal; padding-left: 1.25rem; margin-bottom: 0.75rem; color: #4a4540; }
+    .prose-content li  { margin-bottom: 0.25rem; }
+    .prose-content strong { color: #2C2825; }
 
-    <style>
-        html { font-size: 16px; scroll-behavior: smooth; }
-        body { background-color: #FAF9F5; }
+    /* 제보자 한마디 */
+    blockquote .quote-text,
+    blockquote .quote-text * {
+        font-family: 'Pretendard Variable', Pretendard, sans-serif !important;
+        font-size: 16px !important;
+        word-break: keep-all !important;
+        line-height: 1.5 !important;
+    }
 
-        /* 섹션 카드 내 리치텍스트 스타일 */
-        .prose-content,
-        .prose-content * {
-            font-size: 15px !important;
-            font-family: 'Pretendard Variable', Pretendard, sans-serif !important;
-            color: #2C2825;
-            line-height: 1.5rem;
+    /* 타임라인 */
+    .timeline-item {
+        position: relative;
+        padding-left: 1.75rem;
+        border-left: 2px solid #E8E3DC;
+        padding-bottom: 1.5rem;
+    }
+    .timeline-item:last-child { padding-bottom: 0; border-left-color: transparent; }
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -5px;
+        top: 5px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #DC143C;
+    }
 
-        }
-        .prose-content p   { margin-bottom: 0.75rem; line-height: 1.75; color: #4a4540; }
-        .prose-content a   { color: #DC143C; text-decoration: underline; }
-        .prose-content ul  { list-style: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; color: #4a4540; }
-        .prose-content ol  { list-style: decimal; padding-left: 1.25rem; margin-bottom: 0.75rem; color: #4a4540; }
-        .prose-content li  { margin-bottom: 0.25rem; }
-        .prose-content strong { color: #2C2825; }
+    /* 응원 폼 입력 스타일 */
+    #cheer-form input[type=text],
+    #cheer-form textarea {
+        width: 100%;
+        border: 1px solid #E8E3DC;
+        border-radius: 0.75rem;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+        color: #2C2825;
+        background: #fff;
+        outline: none;
+        font-family: inherit;
+        transition: border-color 0.2s;
+    }
+    #cheer-form input[type=text]:focus,
+    #cheer-form textarea:focus {
+        border-color: #DC143C;
+        box-shadow: 0 0 0 2px rgba(220,20,60,0.08);
+    }
+    #cheer-form textarea { resize: vertical; min-height: 100px; }
+</style>
+{% endblock %}
 
-        /* 제보자 한마디 */
-        blockquote .quote-text,
-        blockquote .quote-text * {
-            font-family: 'Pretendard Variable', Pretendard, sans-serif !important;
-            font-size: 16px !important;
-            word-break: keep-all !important;
-            line-height: 1.5 !important;
-        }
-
-        /* 타임라인 */
-        .timeline-item {
-            position: relative;
-            padding-left: 1.75rem;
-            border-left: 2px solid #E8E3DC;
-            padding-bottom: 1.5rem;
-        }
-        .timeline-item:last-child { padding-bottom: 0; border-left-color: transparent; }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -5px;
-            top: 5px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #DC143C;
-        }
-
-        /* Django form 입력 스타일 */
-        #cheer-form input[type=text],
-        #cheer-form textarea {
-            width: 100%;
-            border: 1px solid #E8E3DC;
-            border-radius: 0.75rem;
-            padding: 0.625rem 0.875rem;
-            font-size: 0.875rem;
-            color: #2C2825;
-            background: #fff;
-            outline: none;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-        #cheer-form input[type=text]:focus,
-        #cheer-form textarea:focus {
-            border-color: #DC143C;
-            box-shadow: 0 0 0 2px rgba(220,20,60,0.08);
-        }
-        #cheer-form textarea { resize: vertical; min-height: 100px; }
-    </style>
-</head>
-<body class="font-sans text-ink antialiased">
-
-{# ══════════════════════════════════════════════ HEADER ══ #}
-<header class="fixed top-0 left-0 right-0 z-50 bg-beige/90 backdrop-blur-md border-b border-stone transition-all">
-    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-
-        <a href="{% url 'whistle_home' %}" class="flex items-center gap-2 font-extrabold text-base text-ink tracking-tight">
-            <img src="{% static 'whistle/img/illust_whistle.svg' %}" class="w-9 h-9" alt="공익제보 아카이브 로고">
-            공익제보 아카이브
-        </a>
-
-        <nav class="hidden md:flex items-center gap-8">
-            <a href="{% url 'whistle_home' %}#archive"   class="text-sm text-smoke hover:text-ink transition-colors">사건 아카이브</a>
-            <a href="{% url 'whistle_home' %}#cheer"     class="text-sm text-smoke hover:text-ink transition-colors">응원하기</a>
-            <a href="{% url 'whistle_home' %}#resources" class="text-sm text-smoke hover:text-ink transition-colors">자료실</a>
-            {% if user.is_authenticated %}
-            <a href="{% url 'whistle:case_list' %}" class="text-sm text-smoke hover:text-ink transition-colors">관리</a>
-            <a href="{% url 'logout' %}" class="text-sm text-smoke hover:text-accent transition-colors">로그아웃</a>
-            {% endif %}
-            <a href="https://box.donus.org/box/peoplepower21/whistleblower" target="_blank"
-               class="text-sm bg-accent text-white font-semibold px-5 py-2 rounded-full hover:bg-red-700 transition-colors shadow-sm">
-                후원하기
-            </a>
-        </nav>
-
-        <button id="mobileMenuBtn" class="md:hidden text-smoke hover:text-ink transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path id="menuIconOpen"  stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                <path id="menuIconClose" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" class="hidden"/>
-            </svg>
-        </button>
-    </div>
-
-    <div id="mobileMenu" class="hidden md:hidden border-t border-stone bg-beige">
-        <div class="px-6 py-5 flex flex-col gap-4">
-            <a href="{% url 'whistle_home' %}#archive"   class="text-sm text-smoke">사건 아카이브</a>
-            <a href="{% url 'whistle_home' %}#cheer"     class="text-sm text-smoke">응원하기</a>
-            <a href="{% url 'whistle_home' %}#resources" class="text-sm text-smoke">자료 / 공지</a>
-            <a href="https://box.donus.org/box/peoplepower21/whistleblower" target="_blank" class="text-sm font-semibold text-accent">후원하기 →</a>
-        </div>
-    </div>
-</header>
-
+{% block content %}
 
 {# ══════════════════════════════════════════════ HERO ══ #}
 <section class="pt-28 pb-14 bg-sand">
@@ -373,65 +288,7 @@
             </div>
             <div id="disqus_thread" class="px-6 py-5"></div>
         </div>
-        <script>
-            var disqus_config = function () {
-                this.page.url = '{{ request.build_absolute_uri }}';
-                this.page.identifier = 'whistle-case-{{ case.pk }}';
-                this.page.title = '{{ case.title|escapejs }}';
-            };
-            (function() {
-                var d = document, s = d.createElement('script');
-                // s.src = 'https://whistle-pspd.disqus.com/embed.js';
-                s.src = 'https://wb-archive.disqus.com/embed.js';
-                s.setAttribute('data-timestamp', +new Date());
-                (d.head || d.body).appendChild(s);
-            })();
-        </script>
         <noscript>댓글을 보려면 JavaScript를 활성화해주세요.</noscript>
-
-        {# ──────────────── 응원글 ──────────────── #}
-<!--        <div id="cheers" class="bg-white rounded-2xl border border-stone overflow-hidden shadow-sm">-->
-<!--            <div class="px-6 py-3.5 border-b border-stone flex items-center gap-2">-->
-<!--                <svg class="w-4 h-4 text-accent" fill="currentColor" viewBox="0 0 20 20">-->
-<!--                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>-->
-<!--                </svg>-->
-<!--                <span class="font-bold text-sm text-ink">응원글</span>-->
-<!--                <span class="ml-1 text-xs text-smoke">(<span id="cheer-count">0</span>)</span>-->
-<!--            </div>-->
-<!--            <div id="cheer-list" class="px-6 py-5 space-y-4">-->
-<!--                <p class="text-sm text-smoke" id="cheer-empty">불러오는 중...</p>-->
-<!--            </div>-->
-<!--        </div>-->
-
-        {# ──────────────── 응원글 작성 ──────────────── #}
-<!--        <div class="bg-white rounded-2xl border border-stone overflow-hidden shadow-sm">-->
-<!--            <div class="px-6 py-3.5 border-b border-stone flex items-center gap-2">-->
-<!--                <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
-<!--                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>-->
-<!--                </svg>-->
-<!--                <span class="font-bold text-sm text-ink">응원글 작성</span>-->
-<!--            </div>-->
-<!--            <div class="px-6 py-5">-->
-<!--                <form id="cheer-form" class="space-y-4">-->
-<!--                    {% csrf_token %}-->
-<!--                    <div>-->
-<!--                        <label class="block text-xs font-semibold text-smoke mb-1.5">이름</label>-->
-<!--                        {{ cheer_form.author_name }}-->
-<!--                    </div>-->
-<!--                    <div>-->
-<!--                        <label class="block text-xs font-semibold text-smoke mb-1.5">응원 메시지</label>-->
-<!--                        {{ cheer_form.content }}-->
-<!--                    </div>-->
-<!--                    <button type="submit" id="cheer-submit-btn"-->
-<!--                            class="inline-flex items-center gap-2 bg-accent text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-red-700 transition-all hover:shadow-md disabled:opacity-60">-->
-<!--                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">-->
-<!--                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>-->
-<!--                        </svg>-->
-<!--                        응원하기-->
-<!--                    </button>-->
-<!--                </form>-->
-<!--            </div>-->
-<!--        </div>-->
 
         {# 목록으로 #}
         <div class="text-center pt-4 pb-2">
@@ -447,136 +304,20 @@
     </div>
 </section>
 
+{% endblock %}
 
-{# ══════════════════════════════════════════════ FOOTER ══ #}
-<footer class="bg-ink text-white">
-    <div class="max-w-6xl mx-auto px-6 py-14">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
-            <div class="md:col-span-2">
-                <div class="flex items-center gap-2 font-extrabold text-base mb-4">
-                    <img src="{% static 'whistle/img/illust_whistle.svg' %}" class="w-[30px] h-[30px]" alt="공익제보 아카이브 로고">
-                    공익제보 아카이브
-                </div>
-                <p class="text-white/50 text-sm leading-relaxed max-w-md">
-                    참여연대 공익제보지원센터가 운영하는 공익제보자 데이터베이스입니다.<br>
-                    더 나은 공익제보자 보호제도를 만들기 위한 기초 자료로 활용됩니다.
-                </p>
-            </div>
-            <div>
-                <h4 class="font-semibold text-xs uppercase tracking-wider mb-4 text-white/50">바로가기</h4>
-                <ul class="space-y-2.5">
-                    <li><a href="/about/" class="text-sm text-white/60 hover:text-white transition-colors">사이트 소개</a></li>
-                    <li><a href="https://www.peoplepower21.org" target="_blank" class="text-sm text-white/60 hover:text-white transition-colors">참여연대 바로가기</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
-            <p class="text-xs text-white/30">02-723-5302 &nbsp;|&nbsp; ws@pspd.org</p>
-            <p class="text-xs text-white/30">&copy; 1994-{% now "Y" %} 참여연대 &nbsp;·&nbsp; <a href="http://creativecommons.org/licenses/by-nc/4.0/" class="hover:text-white/60 transition-colors">CC BY-NC 4.0</a></p>
-        </div>
-    </div>
-</footer>
-
-
-{# ══════════════════════════════════════════════ JS ══ #}
+{% block extra_js %}
 <script>
-/* 모바일 메뉴 */
-(function () {
-    const btn   = document.getElementById('mobileMenuBtn');
-    const menu  = document.getElementById('mobileMenu');
-    const open  = document.getElementById('menuIconOpen');
-    const close = document.getElementById('menuIconClose');
-    btn.addEventListener('click', () => {
-        menu.classList.toggle('hidden');
-        open.classList.toggle('hidden');
-        close.classList.toggle('hidden');
-    });
-    menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-        menu.classList.add('hidden');
-        open.classList.remove('hidden');
-        close.classList.add('hidden');
-    }));
-})();
-
-/* 응원글 */
+var disqus_config = function () {
+    this.page.url = '{{ request.build_absolute_uri }}';
+    this.page.identifier = 'whistle-case-{{ case.pk }}';
+    this.page.title = '{{ case.title|escapejs }}';
+};
 (function() {
-    const LIST_URL   = "{% url 'whistle_cheer_list_api' case.pk %}";
-    const CREATE_URL = "{% url 'whistle_cheer_create' case.pk %}";
-    const CSRF       = "{{ csrf_token }}";
-
-    const listEl  = document.getElementById('cheer-list');
-    const countEl = document.getElementById('cheer-count');
-    const form    = document.getElementById('cheer-form');
-    const btn     = document.getElementById('cheer-submit-btn');
-
-    function esc(t) {
-        const d = document.createElement('div');
-        d.textContent = t;
-        return d.innerHTML;
-    }
-
-    function buildItem(c) {
-        return '<div class="cheer-item flex items-start gap-3 py-3 border-b border-stone last:border-0">'
-            + '<div class="w-8 h-8 rounded-full bg-rose-soft border border-accent/20 flex items-center justify-center shrink-0 text-accent text-xs font-bold">'
-            + esc(c.author_name.charAt(0))
-            + '</div>'
-            + '<div class="min-w-0 flex-1">'
-            + '<div class="flex items-center justify-between mb-1">'
-            + '<span class="font-semibold text-xs text-ink">' + esc(c.author_name) + '</span>'
-            + '<span class="text-xs text-stone">' + esc(c.created_at) + '</span>'
-            + '</div>'
-            + '<p class="text-sm text-smoke leading-relaxed">' + esc(c.content).replace(/\n/g,'<br>') + '</p>'
-            + '</div>'
-            + '</div>';
-    }
-
-    function loadCheers() {
-        fetch(LIST_URL)
-            .then(r => r.json())
-            .then(data => {
-                if (!data.cheers.length) {
-                    listEl.innerHTML = '<p class="text-sm text-smoke">아직 응원글이 없습니다. 첫 번째 응원글을 남겨주세요!</p>';
-                    countEl.textContent = '0';
-                    return;
-                }
-                listEl.innerHTML = data.cheers.map(buildItem).join('');
-                countEl.textContent = data.cheers.length;
-            });
-    }
-
-    loadCheers();
-
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        btn.disabled = true;
-        btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> 전송 중...';
-
-        fetch(CREATE_URL, {
-            method: 'POST',
-            headers: {'X-CSRFToken': CSRF},
-            body: new FormData(form)
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (!data.ok) {
-                alert('응원글 작성에 실패했습니다. 이름과 내용을 확인해주세요.');
-                return;
-            }
-            form.reset();
-            const empty = listEl.querySelector('p');
-            if (empty) empty.remove();
-            listEl.insertAdjacentHTML('afterbegin', buildItem(data.cheer));
-            countEl.textContent = listEl.querySelectorAll('.cheer-item').length;
-            document.getElementById('cheers').scrollIntoView({behavior:'smooth'});
-        })
-        .catch(() => alert('응원글 작성에 실패했습니다.'))
-        .finally(() => {
-            btn.disabled = false;
-            btn.innerHTML = '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/></svg> 응원하기';
-        });
-    });
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wb-archive.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
 })();
 </script>
-
-</body>
-</html>
+{% endblock %}

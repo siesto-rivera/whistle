@@ -88,6 +88,9 @@ TIME_ZONE = "Asia/Seoul"
 USE_I18N = True
 USE_TZ = True
 
+# Disqus
+DISQUS_API_KEY = os.environ.get("DISQUS_API_KEY")
+
 # AWS Setting
 AWS_REGION = "ap-northeast-2"
 AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")

@@ -1,190 +1,75 @@
+{% extends "whistle/layout_whistle_public.html" %}
 {% load static %}
-<!doctype html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="description" content="참여연대 공익제보자 아카이브 - 용기 있는 목소리를 기록합니다"/>
-    <title>공익제보 아카이브 - 참여연대</title>
-    <link rel="icon" type="image/svg+xml" href="{% static 'whistle/img/illust_whistle.svg' %}">
 
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"/>
+{% block head_title %}공익제보 아카이브 - 참여연대{% endblock %}
+{% block head_description %}참여연대 공익제보자 아카이브 - 용기 있는 목소리를 기록합니다{% endblock %}
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        beige:      '#FAF9F5',
-                        sand:       '#F0EDE6',
-                        stone:      '#E8E3DC',
-                        ink:        '#2C2825',
-                        smoke:      'rgb(115 109 102)',
-                        accent:     '#DC143C',
-                        'rose-soft':'#FEF2F2',
-                    },
-                    fontFamily: {
-                        sans: ['Pretendard Variable', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                    },
-                    fontSize: {
-                        'xs': '0.8rem',
-                        'sm': '0.9rem',
-                    },
-                    animation: {
-                        'float':      'float 7s ease-in-out infinite',
-                        'float-slow': 'float 11s ease-in-out 3s infinite',
-                        'float-mid':  'float 9s ease-in-out 1.5s infinite',
-                        'pulse-soft': 'pulse-soft 2.5s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%':      { transform: 'translateY(-18px)' },
-                        },
-                        'pulse-soft': {
-                            '0%, 100%': { opacity: '1' },
-                            '50%':      { opacity: '0.5' },
-                        },
-                    },
-                }
-            }
-        }
-    </script>
+{% block extra_css %}
+<style>
+    /* 스크롤바 숨기기 (cheer 가로 스크롤) */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    <style>
-        html { font-size: 16px; scroll-behavior: smooth; word-break: keep-all; }
-        body { background-color: #FAF9F5; }
+    /* 숫자 카운터 */
+    .count-up { font-variant-numeric: tabular-nums; }
 
-        /* 섹션 fade-in */
-        .fade-section {
-            opacity: 0;
-            transform: translateY(28px);
-            transition: opacity 0.7s ease, transform 0.7s ease;
-        }
-        .fade-section.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    /* ── 시민 한마디 마키 ── */
+    @keyframes voices-scroll {
+        0%   { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+    .voices-track {
+        display: flex;
+        gap: 1.25rem;
+        width: max-content;
+        animation: voices-scroll 50s linear infinite;
+    }
+    .voices-outer:hover .voices-track {
+        animation-play-state: paused;
+    }
+    .voices-card {
+        flex-shrink: 0;
+        width: 22rem;
+        background: #fff;
+        border: 1px solid #E8E3DC;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        transition: box-shadow 0.25s, border-color 0.25s, transform 0.25s;
+    }
+    .voices-card:hover {
+        box-shadow: 0 8px 24px rgba(44,40,37,0.10);
+        border-color: rgba(220,20,60,0.25);
+        transform: translateY(-3px);
+    }
+    .voices-quote {
+        font-size: 0.875rem;
+        color: #555;
+        line-height: 1.75;
+        flex: 1;
+    }
+    .voices-author {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid #F0EDE6;
+        padding-top: 0.75rem;
+    }
+    .voices-name {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #2C2825;
+    }
+    .voices-year {
+        font-size: 0.75rem;
+        color: #8B847C;
+    }
+</style>
+{% endblock %}
 
-        /* 카드 내부 이미지 확대 */
-        .card-zoom img {
-            transition: transform 0.5s ease;
-        }
-        .card-zoom:hover img {
-            transform: scale(1.06);
-        }
-
-        /* 스크롤바 숨기기 (cheer 가로 스크롤) */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* 숫자 카운터 */
-        .count-up { font-variant-numeric: tabular-nums; }
-
-        /* ── 시민 한마디 마키 ── */
-        @keyframes voices-scroll {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        .voices-track {
-            display: flex;
-            gap: 1.25rem;
-            width: max-content;
-            animation: voices-scroll 50s linear infinite;
-        }
-        .voices-outer:hover .voices-track {
-            animation-play-state: paused;
-        }
-        .voices-card {
-            flex-shrink: 0;
-            width: 22rem;
-            background: #fff;
-            border: 1px solid #E8E3DC;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            transition: box-shadow 0.25s, border-color 0.25s, transform 0.25s;
-        }
-        .voices-card:hover {
-            box-shadow: 0 8px 24px rgba(44,40,37,0.10);
-            border-color: rgba(220,20,60,0.25);
-            transform: translateY(-3px);
-        }
-        .voices-quote {
-            font-size: 0.875rem;
-            color: #555;
-            line-height: 1.75;
-            flex: 1;
-        }
-        .voices-author {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-top: 1px solid #F0EDE6;
-            padding-top: 0.75rem;
-        }
-        .voices-name {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #2C2825;
-        }
-        .voices-year {
-            font-size: 0.75rem;
-            color: #8B847C;
-        }
-    </style>
-</head>
-<body class="font-sans text-ink antialiased">
-
-{# ══════════════════════════════════════════════ HEADER ══ #}
-<header class="fixed top-0 left-0 right-0 z-50 bg-beige/90 backdrop-blur-md border-b border-stone transition-all">
-    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-
-        {# 로고 #}
-        <a href="{% url 'whistle_home' %}" class="flex items-center gap-2 font-extrabold text-base text-ink tracking-tight">
-            <img src="{% static 'whistle/img/illust_whistle.svg' %}" class="w-9 h-9" alt="공익제보 아카이브 로고">
-            공익제보 아카이브
-        </a>
-
-        {# 데스크탑 메뉴 #}
-        <nav class="hidden md:flex items-center gap-8">
-            <a href="#archive"   class="text-sm text-smoke hover:text-ink   transition-colors">사건 아카이브</a>
-            <a href="#cheer"     class="text-sm text-smoke hover:text-ink   transition-colors">응원하기</a>
-            <a href="#resources" class="text-sm text-smoke hover:text-ink   transition-colors">자료실</a>
-            {% if user.is_authenticated %}
-            <a href="{% url 'whistle:case_list' %}" class="text-sm text-smoke hover:text-ink transition-colors">관리</a>
-            <a href="{% url 'logout' %}" class="text-sm text-smoke hover:text-accent transition-colors">로그아웃</a>
-            {% endif %}
-            <a href="https://box.donus.org/box/peoplepower21/whistleblower" target="_blank"
-               class="text-sm bg-accent text-white font-semibold px-5 py-2 rounded-full hover:bg-red-700 transition-colors shadow-sm">
-                후원하기
-            </a>
-        </nav>
-
-        {# 모바일 햄버거 #}
-        <button id="mobileMenuBtn" class="md:hidden text-smoke hover:text-ink transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path id="menuIconOpen"  stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                <path id="menuIconClose" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" class="hidden"/>
-            </svg>
-        </button>
-    </div>
-
-    {# 모바일 드롭다운 #}
-    <div id="mobileMenu" class="hidden md:hidden border-t border-stone bg-beige">
-        <div class="px-6 py-5 flex flex-col gap-4">
-            <a href="#archive"   class="text-sm text-smoke">사건 아카이브</a>
-            <a href="#cheer"     class="text-sm text-smoke">응원하기</a>
-            <a href="#resources" class="text-sm text-smoke">자료실</a>
-            <a href="https://box.donus.org/box/peoplepower21/whistleblower" target="_blank"
-               class="text-sm font-semibold text-accent">후원하기 →</a>
-        </div>
-    </div>
-</header>
-
+{% block content %}
 
 {# ══════════════════════════════════════════════ HERO ══ #}
 <section id="home" class="relative min-h-screen flex items-center overflow-hidden bg-beige">
@@ -550,26 +435,6 @@
         </div>
     </div>
 
-    <script>
-    (function () {
-        var track = document.getElementById('voices-track');
-        if (!track) return;
-        var cards = Array.from(track.children);
-        // Fisher-Yates shuffle
-        for (var i = cards.length - 1; i > 0; i--) {
-            var j = Math.floor(Math.random() * (i + 1));
-            track.insertBefore(cards[j], cards[i + 1] || null);
-            var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp;
-        }
-        // 끊김 없는 루프를 위해 복제본 추가
-        cards.forEach(function (card) {
-            track.appendChild(card.cloneNode(true));
-        });
-        // 카드 수에 비례한 애니메이션 속도 (카드당 ~3.3s)
-        track.style.animationDuration = (cards.length * 3.3) + 's';
-    })();
-    </script>
-
 </section>
 
 
@@ -629,76 +494,24 @@
     </div>
 </section>
 
+{% endblock %}
 
-{# ══════════════════════════════════════════════ FOOTER ══ #}
-<footer class="bg-ink text-white">
-    <div class="max-w-6xl mx-auto px-6 py-14">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
-
-            {# 소개 #}
-            <div class="md:col-span-2">
-                <div class="flex items-center gap-2 font-extrabold text-base mb-4">
-                    <img src="{% static 'whistle/img/illust_whistle.svg' %}" class="w-[30px] h-[30px]" alt="공익제보 아카이브 로고">
-                    공익제보 아카이브
-                </div>
-                <p class="text-white/50 text-sm leading-relaxed max-w-md">
-                    참여연대 공익제보지원센터가 운영하는 공익제보자 데이터베이스입니다.<br>
-                    더 나은 공익제보자 보호제도를 만들기 위한 기초 자료로 활용됩니다.
-                </p>
-            </div>
-
-            {# 바로가기 #}
-            <div>
-                <h4 class="font-semibold text-xs uppercase tracking-wider mb-4 text-white/50">바로가기</h4>
-                <ul class="space-y-2.5">
-                    <li><a href="/about/" class="text-sm text-white/60 hover:text-white transition-colors">사이트 소개</a></li>
-                    <li><a href="https://www.peoplepower21.org" target="_blank" class="text-sm text-white/60 hover:text-white transition-colors">참여연대 바로가기</a></li>
-
-                </ul>
-            </div>
-        </div>
-
-        <div class="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-3">
-            <p class="text-xs text-white/30">02-723-5302 &nbsp;|&nbsp; ws@pspd.org</p>
-            <p class="text-xs text-white/30">&copy; 1994-{% now "Y" %} 참여연대 &nbsp;·&nbsp; <a href="http://creativecommons.org/licenses/by-nc/4.0/" class="hover:text-white/60 transition-colors">CC BY-NC 4.0</a></p>
-        </div>
-    </div>
-</footer>
-
-
-{# ══════════════════════════════════════════════ JS ══ #}
+{% block extra_js %}
 <script>
-/* 모바일 메뉴 */
+/* 시민 한마디 마키 셔플 */
 (function () {
-    const btn   = document.getElementById('mobileMenuBtn');
-    const menu  = document.getElementById('mobileMenu');
-    const open  = document.getElementById('menuIconOpen');
-    const close = document.getElementById('menuIconClose');
-    btn.addEventListener('click', () => {
-        menu.classList.toggle('hidden');
-        open.classList.toggle('hidden');
-        close.classList.toggle('hidden');
+    var track = document.getElementById('voices-track');
+    if (!track) return;
+    var cards = Array.from(track.children);
+    for (var i = cards.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        track.insertBefore(cards[j], cards[i + 1] || null);
+        var tmp = cards[i]; cards[i] = cards[j]; cards[j] = tmp;
+    }
+    cards.forEach(function (card) {
+        track.appendChild(card.cloneNode(true));
     });
-    // 메뉴 내 링크 클릭 시 닫기
-    menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-        menu.classList.add('hidden');
-        open.classList.remove('hidden');
-        close.classList.add('hidden');
-    }));
-})();
-
-/* 스크롤 fade-in */
-(function () {
-    const observer = new IntersectionObserver(
-        entries => entries.forEach(e => {
-            if (e.isIntersecting) {
-                e.target.classList.add('visible');
-                observer.unobserve(e.target);
-            }
-        }),
-        { threshold: 0.12 }
-    );
-    document.querySelectorAll('.fade-section').forEach(el => observer.observe(el));
+    track.style.animationDuration = (cards.length * 3.3) + 's';
 })();
 
 /* 숫자 카운터 */
@@ -737,12 +550,10 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
         const target = document.querySelector(id);
         if (!target) return;
         e.preventDefault();
-        const offset = 64; // 헤더 높이
+        const offset = 64;
         const top = target.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'smooth' });
     });
 });
 </script>
-
-</body>
-</html>
+{% endblock %}
