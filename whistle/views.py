@@ -702,3 +702,7 @@ def whistle_cheer_delete(request, pk):
     cheer = get_object_or_404(WhistleCheer, pk=pk)
     cheer.delete()
     return redirect("whistle:cheer_list")
+
+
+class Resources01View(TemplateView):
+    template_name = "whistle/resources_01.html"

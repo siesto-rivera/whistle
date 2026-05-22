@@ -8,6 +8,7 @@ from whistle.views import (
     WhistleHomeView,
     PublicWhistleListView,
     PublicWhistleDetailView,
+    Resources01View,
     whistle_cheer_create,
     whistle_cheer_list_api,
 )
@@ -23,6 +24,7 @@ urlpatterns = [
     # 공개 페이지
     path("", WhistleHomeView.as_view(), name="whistle_home"),
     path("about/", AboutView.as_view(), name="whistle_about"),
+    path("resources/01/", Resources01View.as_view(), name="whistle_resources_01"),
     path("cases/", PublicWhistleListView.as_view(), name="whistle_public_list"),
     path("<int:pk>/", PublicWhistleDetailView.as_view(), name="whistle_public_detail"),
     path("<int:pk>/cheer/", whistle_cheer_create, name="whistle_cheer_create"),
