@@ -4,13 +4,23 @@
 {% block head_title %}{{ case.title }} - 사건 아카이브 - 공익제보 아카이브 - 참여연대{% endblock %}
 {% block head_description %}{{ case.title }} - 공익제보 아카이브 참여연대{% endblock %}
 
+{# 사건별 URL #}
+{% block og_url %}https://wb.peoplepower21.org{% url 'whistle_public_detail' case.pk %}{% endblock %}
+{% block canonical_url %}https://wb.peoplepower21.org{% url 'whistle_public_detail' case.pk %}{% endblock %}
+{% block og_title %}{{ case.title }} - 공익제보 아카이브{% endblock %}
+{% block og_type %}article{% endblock %}
+
+{# 사건별 작성/수정 시간 (없으면 제보년도로 폴백) #}
+{% block article_published_time %}{% if case.created_at %}{{ case.created_at|date:"c" }}{% else %}{{ case.case_year }}-01-01T00:00:00+09:00{% endif %}{% endblock %}
+{% block article_modified_time %}{% if case.updated_at %}{{ case.updated_at|date:"c" }}{% elif case.created_at %}{{ case.created_at|date:"c" }}{% else %}{{ case.case_year }}-01-01T00:00:00+09:00{% endif %}{% endblock %}
+
 {% block extra_css %}
 <style>
     /* 섹션 카드 내 리치텍스트 스타일 */
     .prose-content,
     .prose-content * {
         font-size: 15px !important;
-        font-family: 'Pretendard Variable', Pretendard, sans-serif !important;
+        font-family: Arial, Helvetica, sans-serif !important;
         color: #2C2825;
         line-height: 1.5rem;
     }
@@ -24,7 +34,7 @@
     /* 제보자 한마디 */
     blockquote .quote-text,
     blockquote .quote-text * {
-        font-family: 'Pretendard Variable', Pretendard, sans-serif !important;
+        font-family: Arial, Helvetica, sans-serif !important;
         font-size: 16px !important;
         word-break: keep-all !important;
         line-height: 1.5 !important;

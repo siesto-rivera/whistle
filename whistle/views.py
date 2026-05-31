@@ -239,11 +239,16 @@ class DisadvantageStatsView(LoginRequiredMixin, TemplateView):
             text = strip_tags(case.hidden_disadvantage).strip()
             if not text:
                 continue
+            # 한 줄에 쉼표로 여러 유형이 묶인 경우 각 유형으로 분리해 집계
+            # (단, '파면/해임/해고'처럼 슬래시로 묶인 것은 하나의 유형으로 유지)
+            seen = set()
             for line in text.replace("<br>", "\n").split("\n"):
-                line = line.strip().strip("-").strip()
-                if line:
-                    counter[line] += 1
-                    case_map.setdefault(line, []).append(case)
+                for item in line.split(","):
+                    item = item.strip().strip("-").strip()
+                    if item and item not in seen:
+                        seen.add(item)
+                        counter[item] += 1
+                        case_map.setdefault(item, []).append(case)
         selected = self.request.GET.get("item", "").strip()
         context["stats"] = counter.most_common()
         context["total_items"] = len(counter)
@@ -269,11 +274,16 @@ class ViolationStatsView(LoginRequiredMixin, TemplateView):
             text = strip_tags(case.hidden_violation).strip()
             if not text:
                 continue
+            # 한 줄에 쉼표로 여러 유형이 묶인 경우 각 유형으로 분리해 집계
+            # (단, 슬래시로 묶인 것은 하나의 유형으로 유지)
+            seen = set()
             for line in text.replace("<br>", "\n").split("\n"):
-                line = line.strip().strip("-").strip()
-                if line:
-                    counter[line] += 1
-                    case_map.setdefault(line, []).append(case)
+                for item in line.split(","):
+                    item = item.strip().strip("-").strip()
+                    if item and item not in seen:
+                        seen.add(item)
+                        counter[item] += 1
+                        case_map.setdefault(item, []).append(case)
         selected = self.request.GET.get("item", "").strip()
         context["stats"] = counter.most_common()
         context["total_items"] = len(counter)

@@ -113,6 +113,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 SUMMERNOTE_CONFIG = {
     "iframe": True,
+    # 편집 영역 기본 폰트를 Arial로 지정 (iframe 내부에 주입되는 CSS)
+    "css": (STATIC_URL + "whistle/css/summernote_custom.css",),
     "summernote": {
         "airMode": False,
         "width": "100%",
