@@ -22,10 +22,12 @@ echo "===== $(date '+%Y-%m-%d %H:%M:%S') 인증서 갱신 시작 ====="
 
 # 1) 인증서 갱신 시도 (만료 임박 시에만 실제 갱신됨)
 #    webroot 방식은 최초 발급 시 저장된 renewal conf를 재사용한다.
+#    --no-random-sleep-on-renew: certbot이 비대화형 실행 시 기본으로 넣는
+#    최대 ~8분 랜덤 지연을 끈다(서버 1대라 부하 분산 불필요, 즉시 갱신).
 docker run --rm \
   -v "${CERT_CONF}:/etc/letsencrypt" \
   -v "${CERT_WWW}:/var/www/certbot" \
-  certbot/certbot renew --webroot -w /var/www/certbot
+  certbot/certbot renew --webroot -w /var/www/certbot --no-random-sleep-on-renew
 
 # 2) 갱신된 인증서를 nginx가 다시 읽도록 reload
 if docker ps --format '{{.Names}}' | grep -q "^${NGINX_CONTAINER}$"; then
