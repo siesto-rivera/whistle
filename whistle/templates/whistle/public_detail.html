@@ -14,6 +14,25 @@
 {% block article_published_time %}{% if case.created_at %}{{ case.created_at|date:"c" }}{% else %}{{ case.case_year }}-01-01T00:00:00+09:00{% endif %}{% endblock %}
 {% block article_modified_time %}{% if case.updated_at %}{{ case.updated_at|date:"c" }}{% elif case.created_at %}{{ case.created_at|date:"c" }}{% else %}{{ case.case_year }}-01-01T00:00:00+09:00{% endif %}{% endblock %}
 
+{# 검색엔진용 구조화 데이터 (JSON-LD) #}
+{% block structured_data %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{{ case.title|escapejs }}",
+  "description": "{% if case.content %}{{ case.content|striptags|truncatechars:200|escapejs }}{% else %}{{ case.title|escapejs }} - 공익제보 아카이브 참여연대{% endif %}",
+  "datePublished": "{% if case.created_at %}{{ case.created_at|date:"c" }}{% else %}{{ case.case_year }}-01-01T00:00:00+09:00{% endif %}",
+  "dateModified": "{% if case.updated_at %}{{ case.updated_at|date:"c" }}{% elif case.created_at %}{{ case.created_at|date:"c" }}{% else %}{{ case.case_year }}-01-01T00:00:00+09:00{% endif %}",
+  "author": {
+    "@type": "Organization",
+    "name": "참여연대",
+    "url": "https://wb.peoplepower21.org"
+  }
+}
+</script>
+{% endblock %}
+
 {% block extra_css %}
 <style>
     /* 섹션 카드 내 리치텍스트 스타일 */
