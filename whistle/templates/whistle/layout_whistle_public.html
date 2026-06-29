@@ -5,14 +5,14 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="description" content="{% block head_description %}공익제보 아카이브는 참여연대 공익제보지원센터에서 운영하는 공익제보 데이터베이스로, 우리 사회를 더 나은 곳으로 이끈 공익제보 사건들과 공익제보자들을 기록합니다.{% endblock %}"/>
-    <title>{% block head_title %}공익제보 아카이브111{% endblock %}</title>
+    <title>{% block head_title %}세상을 바꾸는 - 공익제보 아카이브{% endblock %}</title>
     <link rel="icon" type="image/svg+xml" href="{% static 'whistle/img/illust_whistle.svg' %}">
 
     {# ── SEO / Open Graph / Twitter ── #}
     <link rel="canonical" href="{% block canonical_url %}https://wb.peoplepower21.org/{% endblock %}"/>
     <meta property="og:locale" content="ko_KR"/>
     <meta property="og:type" content="{% block og_type %}website{% endblock %}"/>
-    <meta property="og:title" content="{% block og_title %}공익제보 아카이브 - 참여연대{% endblock %}"/>
+    <meta property="og:title" content="{% block og_title %}세상을 바꾸는 - 공익제보 아카이브{% endblock %}"/>
     <meta property="og:description" content="{% block og_description %}공익제보 아카이브는 참여연대 공익제보지원센터에서 운영하는 공익제보 데이터베이스로, 우리 사회를 더 나은 곳으로 이끈 공익제보 사건들과 공익제보자들을 기록합니다.{% endblock %}"/>
     <meta property="og:url" content="{% block og_url %}https://wb.peoplepower21.org/{% endblock %}"/>
     <meta property="og:site_name" content="공익제보 아카이브"/>
@@ -118,7 +118,7 @@
         {# 데스크탑 메뉴 #}
         <nav class="hidden md:flex items-center gap-8">
             <a href="/about/"                            class="text-sm text-smoke hover:text-ink transition-colors">소개</a>
-            <a href="{% url 'whistle_home' %}#archive"   class="text-sm text-smoke hover:text-ink transition-colors">사건 아카이브</a>
+            <a href="{% url 'whistle_home' %}cases"   class="text-sm text-smoke hover:text-ink transition-colors">사건 아카이브</a>
             <a href="{% url 'whistle_home' %}#cheer"     class="text-sm text-smoke hover:text-ink transition-colors">응원하기</a>
             <a href="{% url 'whistle_home' %}#resources" class="text-sm text-smoke hover:text-ink transition-colors">공익제보 TIP</a>
             {% if user.is_authenticated %}
@@ -144,7 +144,7 @@
     <div id="mobileMenu" class="hidden md:hidden border-t border-stone bg-beige">
         <div class="px-6 py-5 flex flex-col gap-4">
             <a href="/about/"                            class="text-sm text-smoke">소개</a>
-            <a href="{% url 'whistle_home' %}#archive"   class="text-sm text-smoke">사건 아카이브</a>
+            <a href="{% url 'whistle_home' %}cases"   class="text-sm text-smoke">사건 아카이브</a>
             <a href="{% url 'whistle_home' %}#cheer"     class="text-sm text-smoke">응원하기</a>
             <a href="{% url 'whistle_home' %}#resources" class="text-sm text-smoke">공익제보 TIP</a>
             <a href="https://box.donus.org/box/peoplepower21/whistleblower" target="_blank"
