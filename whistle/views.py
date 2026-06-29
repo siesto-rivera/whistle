@@ -54,7 +54,17 @@ class WhistleHomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["recent_cases"] = WhistleCase.objects.filter(hide=False).order_by("-case_year", "-id")[:6]
+        featured = list(
+            WhistleCase.objects.filter(hide=False, featured=True).order_by("-case_year", "-id")[:6]
+        )
+        # 메인 노출로 지정된 사건이 6개 미만이면 최신 사건으로 채움
+        if len(featured) < 6:
+            exclude_ids = [c.id for c in featured]
+            fill = WhistleCase.objects.filter(hide=False).exclude(id__in=exclude_ids).order_by(
+                "-case_year", "-id"
+            )[: 6 - len(featured)]
+            featured.extend(fill)
+        context["recent_cases"] = featured
         context["recent_cheers"] = WhistleCheer.objects.select_related("case").order_by("-created_at")[:6]
         context["total_cases"] = WhistleCase.objects.filter(hide=False).count()
         context["total_cheers"] = _get_disqus_comment_count()
@@ -459,6 +469,8 @@ class WhistleCaseListView(LoginRequiredMixin, ListView):
         context["categories"] = WhistleCase.CATEGORY_CHOICES
         context["organizations"] = WhistleCase.ORGANIZATION_CHOICES
         context["all_tags"] = self._all_tags()
+        context["featured_count"] = WhistleCase.objects.filter(featured=True).count()
+        context["featured_limit"] = FEATURED_LIMIT
         return context
 
 
@@ -543,6 +555,38 @@ def whistle_case_delete(request, pk):
     case = get_object_or_404(WhistleCase, pk=pk)
     case.delete()
     return redirect("whistle:case_list")
+
+
+FEATURED_LIMIT = 6
+
+
+@login_required
+@require_POST
+def toggle_featured(request, pk):
+    """메인화면 노출 사건 토글 (최대 6개)"""
+    case = get_object_or_404(WhistleCase, pk=pk)
+    if not case.featured:
+        if WhistleCase.objects.filter(featured=True).count() >= FEATURED_LIMIT:
+            return JsonResponse(
+                {
+                    "ok": False,
+                    "featured": False,
+                    "count": FEATURED_LIMIT,
+                    "error": f"메인 노출은 최대 {FEATURED_LIMIT}개까지 설정할 수 있습니다.",
+                },
+                status=400,
+            )
+        case.featured = True
+    else:
+        case.featured = False
+    case.save(update_fields=["featured"])
+    return JsonResponse(
+        {
+            "ok": True,
+            "featured": case.featured,
+            "count": WhistleCase.objects.filter(featured=True).count(),
+        }
+    )
 
 
 # ── 타임라인 ─────────────────────────────────────────────────

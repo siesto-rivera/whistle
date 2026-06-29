@@ -41,6 +41,7 @@ class WhistleCase(models.Model):
     prize = models.BooleanField("참여연대 공익제보자상 수상", default=False)
     memo = models.TextField("참고", blank=True)
     hide = models.BooleanField("비공개", default=False)
+    featured = models.BooleanField("메인 노출", default=False)
     created_at = models.DateTimeField("작성일", auto_now_add=True, null=True)
     updated_at = models.DateTimeField("수정일", auto_now=True, null=True)
 

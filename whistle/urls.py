@@ -21,6 +21,7 @@ urlpatterns = [
     path("create/", views.WhistleCaseCreateView.as_view(), name="case_create"),
     path("<int:pk>/edit/", views.WhistleCaseUpdateView.as_view(), name="case_update"),
     path("<int:pk>/delete/", views.whistle_case_delete, name="case_delete"),
+    path("<int:pk>/toggle-featured/", views.toggle_featured, name="toggle_featured"),
     # 타임라인
     path("timeline/", views.WhistleTimelineListView.as_view(), name="timeline_list"),
     path("timeline/<int:pk>/", views.WhistleTimelineDetailView.as_view(), name="timeline_detail"),

@@ -43,6 +43,9 @@
         <thead class="table-dark">
             <tr>
                 <th scope="col" style="width:60px;">#</th>
+                <th scope="col" class="text-center" style="width:80px;" title="메인화면 노출 (최대 {{ featured_limit }}개)">
+                    메인 <span id="featuredCount" class="badge bg-danger">{{ featured_count }}</span>/{{ featured_limit }}
+                </th>
                 <th scope="col">
                     <a href="?sort={% if current_sort == 'title_asc' %}title_desc{% else %}title_asc{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="text-white text-decoration-none">
                         사건명
@@ -80,6 +83,15 @@
         {% for case in cases %}
             <tr>
                 <td class="text-muted">{{ case.id }}</td>
+                <td class="text-center">
+                    <button type="button"
+                            class="btn btn-sm btn-link p-0 fs-5 btn-featured {% if case.featured %}text-warning{% else %}text-muted{% endif %}"
+                            data-url="{% url 'whistle:toggle_featured' case.pk %}"
+                            data-featured="{{ case.featured|yesno:'1,0' }}"
+                            title="메인화면 노출 토글">
+                        <i class="bi {% if case.featured %}bi-star-fill{% else %}bi-star{% endif %}"></i>
+                    </button>
+                </td>
                 <td><a href="{% url 'whistle:case_detail' case.pk %}" class="text-decoration-none"><strong>{{ case.title }}</strong></a></td>
                 <td>{{ case.case_year }}</td>
                 <td>{{ case.whistleblower }}</td>
@@ -96,12 +108,52 @@
                 </td>
             </tr>
         {% empty %}
-            <tr><td colspan="11" class="text-center text-muted py-4">데이터가 없습니다.</td></tr>
+            <tr><td colspan="12" class="text-center text-muted py-4">데이터가 없습니다.</td></tr>
         {% endfor %}
         </tbody>
     </table>
 </div>
 
 {% include "_pagination.html" %}
+
+<script>
+(function () {
+    const csrfToken = '{{ csrf_token }}';
+    const limit = {{ featured_limit }};
+    const countEl = document.getElementById('featuredCount');
+
+    document.querySelectorAll('.btn-featured').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            btn.disabled = true;
+            fetch(btn.dataset.url, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrfToken },
+            })
+                .then(r => r.json().then(data => ({ ok: r.ok, data })))
+                .then(({ ok, data }) => {
+                    if (!ok) {
+                        alert(data.error || '처리에 실패했습니다.');
+                        return;
+                    }
+                    const icon = btn.querySelector('i');
+                    if (data.featured) {
+                        icon.className = 'bi bi-star-fill';
+                        btn.classList.remove('text-muted');
+                        btn.classList.add('text-warning');
+                    } else {
+                        icon.className = 'bi bi-star';
+                        btn.classList.remove('text-warning');
+                        btn.classList.add('text-muted');
+                    }
+                    btn.dataset.featured = data.featured ? '1' : '0';
+                    countEl.textContent = data.count;
+                    countEl.classList.toggle('bg-danger', data.count <= limit);
+                })
+                .catch(() => alert('네트워크 오류가 발생했습니다.'))
+                .finally(() => { btn.disabled = false; });
+        });
+    });
+})();
+</script>
 
 {% endblock %}
