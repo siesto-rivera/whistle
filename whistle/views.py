@@ -426,6 +426,8 @@ class WhistleCaseListView(LoginRequiredMixin, ListView):
         "year_desc": "-case_year",
         "hide_asc": "hide",
         "hide_desc": "-hide",
+        "featured_asc": "featured",
+        "featured_desc": "-featured",
     }
 
     def get_queryset(self):

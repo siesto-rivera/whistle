@@ -43,8 +43,14 @@
         <thead class="table-dark">
             <tr>
                 <th scope="col" style="width:60px;">#</th>
-                <th scope="col" class="text-center" style="width:80px;" title="메인화면 노출 (최대 {{ featured_limit }}개)">
-                    메인 <span id="featuredCount" class="badge bg-danger">{{ featured_count }}</span>/{{ featured_limit }}
+                <th scope="col" class="text-center" style="width:90px;" title="메인화면 노출 (최대 {{ featured_limit }}개)">
+                    <a href="?sort={% if current_sort == 'featured_desc' %}featured_asc{% else %}featured_desc{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="text-white text-decoration-none">
+                        메인
+                        {% if current_sort == 'featured_asc' %}<i class="bi bi-caret-up-fill small"></i>
+                        {% elif current_sort == 'featured_desc' %}<i class="bi bi-caret-down-fill small"></i>
+                        {% else %}<i class="bi bi-caret-down small opacity-50"></i>{% endif %}
+                    </a>
+                    <span id="featuredCount" class="badge bg-danger">{{ featured_count }}</span>/{{ featured_limit }}
                 </th>
                 <th scope="col">
                     <a href="?sort={% if current_sort == 'title_asc' %}title_desc{% else %}title_asc{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="text-white text-decoration-none">
