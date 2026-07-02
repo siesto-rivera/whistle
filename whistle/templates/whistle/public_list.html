@@ -4,6 +4,71 @@
 {% block head_title %}사건 아카이브 - 공익제보 아카이브 - 참여연대{% endblock %}
 {% block head_description %}공익제보 아카이브 - 참여연대{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* ── 모바일: 필터 칩 횡스크롤 (768px 이하) ── */
+    @media (max-width: 768px) {
+        #filterSection {
+            position: static !important;
+            overflow-x: hidden;
+        }
+        .filter-groups {
+            width: 100% !important;
+            min-width: 0 !important;
+            flex: 1 1 100% !important;
+        }
+        .filter-group {
+            position: relative;
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            gap: 0 !important;
+            width: 100% !important;
+            min-width: 0 !important;
+        }
+        .filter-label {
+            flex: 0 0 auto !important;
+            padding: 0 8px 0 16px !important;
+            margin: 0 !important;
+            white-space: nowrap;
+        }
+        .chip-row {
+            display: flex !important;
+            flex: 1 1 auto !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            gap: 8px !important;
+            padding: 2px 16px 4px 0;
+            scroll-snap-type: x proximity;
+            overflow-anchor: none;
+            width: auto !important;
+            min-width: 0 !important;
+        }
+        .chip-row::-webkit-scrollbar {
+            display: none;
+        }
+        .chip {
+            flex: 0 0 auto !important;
+            white-space: nowrap !important;
+            scroll-snap-align: start;
+        }
+        .filter-group::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 28px;
+            background: linear-gradient(to left, #FAF9F5, transparent);
+            pointer-events: none;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 
 {# ══════════════════════════════════════════════ PAGE HERO ══ #}
@@ -24,56 +89,62 @@
 
 
 {# ══════════════════════════════════════════════ 검색 + 필터 ══ #}
-<section class="bg-beige border-b border-stone py-4 sticky top-16 z-40">
+<section id="filterSection" class="bg-beige border-b border-stone py-4 sticky top-16 z-40">
     <div class="max-w-6xl mx-auto px-6">
         <div class="flex flex-wrap justify-between items-center gap-3">
 
             {# 필터 #}
-            <div class="flex flex-col gap-2">
-                <div class="flex flex-wrap gap-2 items-center">
-                    <span class="text-xs text-smoke font-bold mr-1">공익침해분야</span>
-                    <a href="{% url 'whistle_public_list' %}{% if current_organization or current_tag %}?{% if current_organization %}organization={{ current_organization }}{% endif %}{% if current_organization and current_tag %}&{% endif %}{% if current_tag %}tag={{ current_tag|urlencode }}{% endif %}{% endif %}"
-                       class="text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
-                       {% if not current_category %}bg-accent text-white border-accent{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
-                        전체
-                    </a>
-                    {% for value, label in categories %}
-                    <a href="{% url 'whistle_public_list' %}?category={{ value }}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
-                       class="text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
-                       {% if current_category == value %}bg-accent text-white border-accent{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
-                        {{ label }}
-                    </a>
-                    {% endfor %}
+            <div class="filter-groups flex flex-col gap-2">
+                <div class="filter-group flex flex-wrap gap-2 items-center">
+                    <span class="filter-label text-xs text-smoke font-bold mr-1">공익침해분야</span>
+                    <div class="chip-row contents">
+                        <a href="{% url 'whistle_public_list' %}{% if current_organization or current_tag %}?{% if current_organization %}organization={{ current_organization }}{% endif %}{% if current_organization and current_tag %}&{% endif %}{% if current_tag %}tag={{ current_tag|urlencode }}{% endif %}{% endif %}"
+                           class="chip text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
+                           {% if not current_category %}bg-accent text-white border-accent is-active{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
+                            전체
+                        </a>
+                        {% for value, label in categories %}
+                        <a href="{% url 'whistle_public_list' %}?category={{ value }}{% if current_organization %}&organization={{ current_organization }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
+                           class="chip text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
+                           {% if current_category == value %}bg-accent text-white border-accent is-active{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
+                            {{ label }}
+                        </a>
+                        {% endfor %}
+                    </div>
                 </div>
-                <div class="flex flex-wrap gap-2 items-center">
-                    <span class="text-xs text-smoke font-bold mr-1">신고대상</span>
-                    <a href="{% url 'whistle_public_list' %}{% if current_category or current_tag %}?{% if current_category %}category={{ current_category }}{% endif %}{% if current_category and current_tag %}&{% endif %}{% if current_tag %}tag={{ current_tag|urlencode }}{% endif %}{% endif %}"
-                       class="text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
-                       {% if not current_organization %}bg-accent text-white border-accent{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
-                        전체
-                    </a>
-                    {% for value, label in organizations %}
-                    <a href="{% url 'whistle_public_list' %}?organization={{ value }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
-                       class="text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
-                       {% if current_organization == value %}bg-accent text-white border-accent{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
-                        {{ label }}
-                    </a>
-                    {% endfor %}
+                <div class="filter-group flex flex-wrap gap-2 items-center">
+                    <span class="filter-label text-xs text-smoke font-bold mr-1">신고대상</span>
+                    <div class="chip-row contents">
+                        <a href="{% url 'whistle_public_list' %}{% if current_category or current_tag %}?{% if current_category %}category={{ current_category }}{% endif %}{% if current_category and current_tag %}&{% endif %}{% if current_tag %}tag={{ current_tag|urlencode }}{% endif %}{% endif %}"
+                           class="chip text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
+                           {% if not current_organization %}bg-accent text-white border-accent is-active{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
+                            전체
+                        </a>
+                        {% for value, label in organizations %}
+                        <a href="{% url 'whistle_public_list' %}?organization={{ value }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_tag %}&tag={{ current_tag|urlencode }}{% endif %}"
+                           class="chip text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
+                           {% if current_organization == value %}bg-accent text-white border-accent is-active{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
+                            {{ label }}
+                        </a>
+                        {% endfor %}
+                    </div>
                 </div>
-                <div class="flex flex-wrap gap-2 items-center">
-                    <span class="text-xs text-smoke font-bold mr-1">주요태그</span>
-                    <a href="{% url 'whistle_public_list' %}{% if current_category or current_organization %}?{% if current_category %}category={{ current_category }}{% endif %}{% if current_category and current_organization %}&{% endif %}{% if current_organization %}organization={{ current_organization }}{% endif %}{% endif %}"
-                       class="text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
-                       {% if not current_tag %}bg-accent text-white border-accent{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
-                        전체
-                    </a>
-                    {% for tag in all_tags %}
-                    <a href="{% url 'whistle_public_list' %}?tag={{ tag|urlencode }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}"
-                       class="text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
-                       {% if current_tag == tag %}bg-accent text-white border-accent{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
-                        {{ tag }}
-                    </a>
-                    {% endfor %}
+                <div class="filter-group flex flex-wrap gap-2 items-center">
+                    <span class="filter-label text-xs text-smoke font-bold mr-1">주요태그</span>
+                    <div class="chip-row contents">
+                        <a href="{% url 'whistle_public_list' %}{% if current_category or current_organization %}?{% if current_category %}category={{ current_category }}{% endif %}{% if current_category and current_organization %}&{% endif %}{% if current_organization %}organization={{ current_organization }}{% endif %}{% endif %}"
+                           class="chip text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
+                           {% if not current_tag %}bg-accent text-white border-accent is-active{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
+                            전체
+                        </a>
+                        {% for tag in all_tags %}
+                        <a href="{% url 'whistle_public_list' %}?tag={{ tag|urlencode }}{% if current_category %}&category={{ current_category }}{% endif %}{% if current_organization %}&organization={{ current_organization }}{% endif %}"
+                           class="chip text-xs font-semibold px-4 py-1.5 rounded-full border transition-all
+                           {% if current_tag == tag %}bg-accent text-white border-accent is-active{% else %}bg-white text-smoke border-stone hover:border-accent hover:text-accent{% endif %}">
+                            {{ tag }}
+                        </a>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
 
@@ -195,4 +266,25 @@
     </div>
 </section>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* 모바일 필터 칩 횡스크롤: 로드 시 활성 칩이 보이도록 스크롤 위치 보정 */
+    function alignActiveChips() {
+        document.querySelectorAll('.chip-row').forEach(function (row) {
+            var active = row.querySelector('.chip.is-active');
+            if (!active) return;
+            var rowRect = row.getBoundingClientRect();
+            var activeRect = active.getBoundingClientRect();
+            var offset = (activeRect.left - rowRect.left) + row.scrollLeft;
+            row.scrollLeft = Math.max(0, offset - 16);
+        });
+    }
+    if (document.readyState === 'complete') {
+        alignActiveChips();
+    } else {
+        window.addEventListener('load', alignActiveChips);
+    }
+</script>
 {% endblock %}
